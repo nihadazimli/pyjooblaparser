@@ -7,3 +7,4 @@ class ListingParser(object):
         resume,
         skills_file=None,
     ):
+        pass
