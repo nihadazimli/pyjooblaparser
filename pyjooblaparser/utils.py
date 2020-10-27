@@ -1,4 +1,5 @@
-
+#Libraries to be used
+from textblob import TextBlob
 
 def extract_text(resume_full_name, ext):
     # To be populated
@@ -30,3 +31,10 @@ def extract_skills(text_raw, skills_file_location):
 
     pass
 
+
+
+def noun_phase_extractor(text_raw):
+    # Extract Noun Phrases using  TextBlob Library
+    blob = TextBlob(text_raw)
+    nouns = blob.noun_phrases
+    return nouns
