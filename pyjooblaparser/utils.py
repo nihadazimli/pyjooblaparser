@@ -4,6 +4,7 @@ import textract
 from textblob import TextBlob
 from pdfminer.converter import TextConverter
 from pdfminer.pdfinterp import PDFPageInterpreter
+from pdfminer.layout import LAParams
 from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.pdfpage import PDFPage
 import io
@@ -60,7 +61,7 @@ def noun_phase_extractor(text_raw):
 def extract_text_from_pdf(pdf_path):
     resource_manager = PDFResourceManager()
     fake_file_handle = io.StringIO()
-    converter = TextConverter(resource_manager, fake_file_handle)
+    converter = TextConverter(resource_manager, fake_file_handle, laparams=LAParams())
     page_interpreter = PDFPageInterpreter(resource_manager, converter)
 
     with open(pdf_path, 'rb') as fh:
