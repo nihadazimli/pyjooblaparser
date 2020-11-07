@@ -8,6 +8,7 @@ from pdfminer.layout import LAParams
 from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.pdfpage import PDFPage
 import io
+import re
 
 
 def extract_text(resume_full_path, ext):
@@ -29,9 +30,27 @@ def extract_name():
     pass
 
 
-def extract_email():
-    # To be populated
-    pass
+def extract_email(text_raw):
+
+    # Input email regex
+    regex = r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x" \
+            r"23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](" \
+            r"?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01" \
+            r"]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0" \
+            r"b\x0c\x0e-\x7f])+)\])"
+
+    matches = re.findall(regex, text_raw, re.MULTILINE)
+
+    return matches[0]
+
+
+def extract_number(text_raw):
+    # Input email regex
+    regex = r"(?:(?:\+?([1-9]|[0-9][0-9]|[0-9][0-9][0-9])\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9]" \
+            r"[02-8][02-9])\s*\)|([0-9][1-9]|[0-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1" \
+            r"[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?\n"
+    matches = re.findall(regex, text_raw, re.MULTILINE)
+    return "".join(matches[0])
 
 
 def extract_location():
@@ -48,7 +67,6 @@ def extract_skills(text_raw, skills_file_location):
     # return list of skill out of text raw string input
 
     pass
-
 
 
 def noun_phase_extractor(text_raw):

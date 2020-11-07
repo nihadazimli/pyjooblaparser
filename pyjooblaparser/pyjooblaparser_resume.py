@@ -1,7 +1,8 @@
 import io
 import os
+import re
 from . import utils
-
+from . import config
 
 class ResumeParser(object):
 
@@ -39,5 +40,10 @@ class ResumeParser(object):
         return self.__text_raw
 
     def __populate_details(self):
-        # To be populated
-        pass
+
+        # personal_information_seperator_regex = config.PERSONAL_INFORMATION_SEPERATOR
+        # personal_information_raw_text = re.split(personal_information_seperator_regex, self.__text_raw.lower())
+        self.__details['email'] = utils.extract_email(self.__text_raw)
+        self.__details['mobile_number'] = utils.extract_number(self.__text_raw)
+
+        return self
