@@ -2,3 +2,4 @@ pdfminer.six==20201018
 textblob
 docx2txt==0.8
 textract==1.6.3
+geograpy3==0.1.24
