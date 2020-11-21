@@ -153,7 +153,7 @@ def extract_text_from_any(file_path):
         return ' '
 
 
-def cluster_finder(text_raw,this):
+def cluster_finder(text_raw,this,soft=False):
     text = text_raw.strip(":")
     text = text.lower()
     text = text.split("\n")
@@ -175,6 +175,7 @@ def cluster_finder(text_raw,this):
                 t = ste.search(big)
                 ve = t.start()
                 line.append(ve)
-
+    if soft == True:
+        return label
     return label,line
 

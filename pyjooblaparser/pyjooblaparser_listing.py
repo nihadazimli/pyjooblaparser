@@ -35,11 +35,12 @@ class ListingParser(object):
         self.__nlp = nlp(self.__text)
         self.__noun_chunks = list(self.__nlp.noun_chunks)
 
-    def cluster_divider(self,__text_raw , file1,file2):
+    def cluster_divider(self,__text_raw , file1,file2,file3):
         nlp = spacy.load('en_core_web_sm')
         string_must, must_index = utils.cluster_finder(self.__text_raw, file1)
         string_good, good_index = utils.cluster_finder(self.__text_raw, file2)
         text = self.__text_raw
+        skills = {}
         if len(must_index) > 0 and len(good_index) > 0:
             must_index_i = min(must_index)
             good_index_i = min(good_index)
@@ -61,7 +62,10 @@ class ListingParser(object):
             noun_chunks_must = list(nlp_must.noun_chunks)
             must_skills = utils.extract_skills(nlp_must, noun_chunks_must)
             skills = {"Cluster 1": must_skills, "Cluster 2":None}
-
+        # nlp_soft = nlp(text)
+        # noun_chunks_must = list(nlp_soft.noun_chunks)
+        soft_skills =  utils.cluster_finder(text,"./clusters/soft_skills.txt",True)
+        skills['Cluster 3'] = soft_skills
 
         return skills
 
