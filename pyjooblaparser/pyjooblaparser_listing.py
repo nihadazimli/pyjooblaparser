@@ -56,6 +56,12 @@ class ListingParser(object):
             noun_chunks_must = list(nlp_must.noun_chunks)
             must_skills = utils.extract_skills(nlp_must, noun_chunks_must)
             skills = {"Cluster 1": must_skills, "Cluster 2":None}
+        if len(must_index) == 0 and len(good_index) == 0:
+            nlp_must = nlp(text)
+            noun_chunks_must = list(nlp_must.noun_chunks)
+            must_skills = utils.extract_skills(nlp_must, noun_chunks_must)
+            skills = {"Cluster 1": must_skills, "Cluster 2":None}
+
 
         return skills
 

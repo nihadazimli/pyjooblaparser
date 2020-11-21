@@ -68,7 +68,7 @@ def extract_skills(text_raw, noun_chunks,skills_file=None):
     # return list of skill out of text raw string input
     '''
     Helper function to extract skills from spacy nlp text
-    :param nlp_text: object of `spacy.tokens.doc.Doc`
+    :param text_raw: object of `spacy.tokens.doc.Doc`
     :param noun_chunks: noun chunks extracted from nlp text
     :return: list of skills extracted
     '''
