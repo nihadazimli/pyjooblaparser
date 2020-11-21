@@ -3,6 +3,7 @@ import os
 import re
 from . import utils
 from . import config
+import spacy
 
 class ResumeParser(object):
 
@@ -29,7 +30,12 @@ class ResumeParser(object):
         else:
             ext = '.' + self.__resume.name.split('.')[1]
 
+        nlp = spacy.load('en_core_web_sm')
+
         self.__text_raw = utils.extract_text(self.__resume, ext)
+        self.__text = ' '.join(self.__text_raw.split())
+        self.__nlp = nlp(self.__text)
+        self.__noun_chunks = list(self.__nlp.noun_chunks)
 
         self.__populate_details()
 
@@ -45,5 +51,5 @@ class ResumeParser(object):
         # personal_information_raw_text = re.split(personal_information_seperator_regex, self.__text_raw.lower())
         self.__details['email'] = utils.extract_email(self.__text_raw)
         self.__details['mobile_number'] = utils.extract_number(self.__text_raw)
-
+        self.__details['skills'] = utils.extract_skills(self.__nlp,self.__noun_chunks,None)
         return self

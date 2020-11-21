@@ -9,6 +9,8 @@ from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.pdfpage import PDFPage
 import io
 import re
+import os
+import pandas as pd
 
 
 def extract_text(resume_full_path, ext):
@@ -58,15 +60,53 @@ def extract_location():
     pass
 
 
-def extract_skills(text_raw, skills_file_location):
+def extract_skills(text_raw, noun_chunks,skills_file=None):
     # Inputs are:
     # text raw: full string version of CV file
     # skills_file_location: full name and location of skills file (e.g. path\to\skills.csv)
-
     # To be populated
     # return list of skill out of text raw string input
+    '''
+    Helper function to extract skills from spacy nlp text
+    :param nlp_text: object of `spacy.tokens.doc.Doc`
+    :param noun_chunks: noun chunks extracted from nlp text
+    :return: list of skills extracted
+    '''
+    tokens = [token.text for token in text_raw if not token.is_stop]
+    if not skills_file:
+        data = pd.read_csv(
+            os.path.join(os.path.dirname(__file__), 'updated_u.csv')
 
-    pass
+        )
+        print(data)
+
+    else:
+        data = pd.read_csv(skills_file)
+    skills = list(data.columns.values)
+    skillset = {}
+    # check for one-grams
+    for token in tokens:
+        if token.lower() in skills:
+            token = token.lower()
+            if skillset.get(token, -1) == -1:
+                skillset[token] = 1
+
+            else:
+                skillset[token] = skillset[token] + 1
+
+    # check for bi-grams and tri-grams
+    for token in noun_chunks:
+        token = token.text.lower().strip()
+        if token in skills:
+            token = token.lower()
+            if skillset.get(token, -1) == -1:
+                skillset[token] = 1
+
+            else:
+                skillset[token] = skillset[token] + 1
+
+    return skillset
+
 
 
 def noun_phase_extractor(text_raw):
@@ -87,8 +127,8 @@ def extract_text_from_pdf(pdf_path):
                                       caching=True,
                                       check_extractable=True):
             page_interpreter.process_page(page)
-
         text = fake_file_handle.getvalue()
+        print(text)
 
     # close open handles
     converter.close()
