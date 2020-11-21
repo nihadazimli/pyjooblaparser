@@ -6,7 +6,7 @@ def main():
     text ="./clusters/text.txt"
     listing = ListingParser(text)
     print(resume.get_details())
-    print(listing.cluster_divider(text,"./clusters/must_have.txt","./clusters/good_to_have.txt"))
+    print(listing.cluster_divider(text,"./clusters/must_have.txt","./clusters/good_to_have.txt","./clusters/soft_skills.txt"))
 
 
 if __name__ == '__main__':
