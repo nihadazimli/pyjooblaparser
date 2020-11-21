@@ -2,11 +2,16 @@ from pyjooblaparser import ResumeParser
 from pyjooblaparser import ListingParser
 
 def main():
-    resume = ResumeParser('./sample_cvs/Ismayil\'s Resume.pdf')
+    resume = ResumeParser('./sample_cvs/nihad-azimli-resume.pdf')
     text ="./clusters/text.txt"
     listing = ListingParser(text)
-    print(resume.get_details())
-    print(listing.cluster_divider(text,"./clusters/must_have.txt","./clusters/good_to_have.txt","./clusters/soft_skills.txt"))
+    resume_skills = resume.get_details()['skills']
+
+    dict_test = {'a':3,'b':3,'c':3}
+
+    print(len(dict_test))
+
+    print(listing.cluster_divider())
 
 
 if __name__ == '__main__':

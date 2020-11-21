@@ -5,6 +5,7 @@ from . import utils
 from . import config
 import spacy
 
+
 class ListingParser(object):
 
     def __init__(
@@ -35,7 +36,7 @@ class ListingParser(object):
         self.__nlp = nlp(self.__text)
         self.__noun_chunks = list(self.__nlp.noun_chunks)
 
-    def cluster_divider(self,__text_raw , file1,file2,file3):
+    def cluster_divider(self, file1, file2, file3):
         nlp = spacy.load('en_core_web_sm')
         string_must, must_index = utils.cluster_finder(self.__text_raw, file1)
         string_good, good_index = utils.cluster_finder(self.__text_raw, file2)
@@ -64,7 +65,7 @@ class ListingParser(object):
             skills = {"Cluster 1": must_skills, "Cluster 2":None}
         # nlp_soft = nlp(text)
         # noun_chunks_must = list(nlp_soft.noun_chunks)
-        soft_skills =  utils.cluster_finder(text,"./clusters/soft_skills.txt",True)
+        soft_skills =  utils.cluster_finder(text, file3, True)
         skills['Cluster 3'] = soft_skills
 
         return skills

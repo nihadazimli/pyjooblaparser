@@ -3,7 +3,8 @@ from werkzeug.utils import secure_filename
 import os
 import config
 import csv
-from pyresparser import ResumeParser
+from pyjooblaparser import ResumeParser
+from pyjooblaparser import ListingParser
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = config.UPLOAD_FILES_DIR
@@ -82,37 +83,85 @@ def algorithm_result():
         listing_name = request.form['Listing']
 
         # Do your logic here
-        cv_data = ResumeParser(config.UPLOAD_FILES_DIR + config.CV_SUBFOLDER + '/' + cv_name).get_extracted_data()
+        cv_data = ResumeParser(config.UPLOAD_FILES_DIR + config.CV_SUBFOLDER + '/' + cv_name).get_details()
         skills_cv = cv_data['skills']
-        skills_cv = map(lambda x: x.lower(), skills_cv)
-        skills_cv = list(skills_cv)
+        skills_cv_list = skills_cv.keys()
 
-        listing_data = ResumeParser(
-            config.UPLOAD_FILES_DIR + config.LISTING_SUBFOLDER + '/' + listing_name).get_extracted_data()
-        skills_listing = listing_data['skills']
-        skills_listing = map(lambda x: x.lower(), skills_listing)
-        skills_listing = list(skills_listing)
+        listing_data = ListingParser(config.UPLOAD_FILES_DIR + config.LISTING_SUBFOLDER + '/' + listing_name)\
+            .cluster_divider("./clusters/must_have.txt", "./clusters/good_to_have.txt", "./clusters/soft_skills.txt")
+        print(listing_data)
 
-        print("skills_listing:", skills_listing)
-        print("skills_cv:", skills_cv)
+        score = 0
 
-        intersection_list = list(set(skills_cv) & set(skills_listing))
-        print(intersection_list)
+        listing_list_total_len = 0
+        if type(listing_data['Cluster 1']) is dict:
+            skills_listing_must = listing_data['Cluster 1']
+            listing_list_total_len += len(skills_listing_must)
+        else:
+            skills_listing_must = {}
+        if type(listing_data['Cluster 2']) is dict:
+            skills_listing_good = listing_data['Cluster 2']
+            listing_list_total_len += len(skills_listing_good)
+        else:
+            skills_listing_good = {}
+        if type(listing_data['Cluster 3']) is list:
+            skills_listing_soft = listing_data['Cluster 3']
+            listing_list_total_len += len(skills_listing_soft)
+        else:
+            skills_listing_soft = []
 
-        matching_skills = ", ".join(str(x) for x in intersection_list)
-        listing_skills_result = ", ".join(str(x) for x in list(skills_listing))
-        cv_skills_result = ", ".join(str(x) for x in list(skills_cv))
+        print("skills_cv:", skills_cv_list)
 
-        print(matching_skills)
-        print(listing_skills_result)
+        intersection_list_total_len = 0
+        try:
+            intersection_list_must = list(set(skills_cv) & set(skills_listing_must.keys()))
+            intersection_list_total_len += len(intersection_list_must)
+            score += len(intersection_list_must)*60
+        except:
+            intersection_list_must = {}
+
+        try:
+            intersection_list_good = list(set(skills_cv) & set(skills_listing_good.keys()))
+            intersection_list_total_len += len(intersection_list_good)
+            score += len(intersection_list_good)*30
+        except:
+            intersection_list_good = {}
+
+        try:
+            intersection_list_soft = list(set(skills_cv) & set(skills_listing_soft))
+            intersection_list_total_len += len(intersection_list_soft)
+            score += len(intersection_list_soft)*10
+        except:
+            intersection_list_soft = []
+
+        matching_skills_must = intersection_list_must
+        matching_skills_good = intersection_list_good
+        matching_skills_soft = intersection_list_soft
+
+        listing_skills_must = ", ".join((k + ' : ' + str(v)) for k, v in skills_listing_must.items())
+        listing_skills_must = listing_skills_must.split(',')
+        listing_skills_good = ", ".join((k + ' : ' + str(v)) for k, v in skills_listing_good.items())
+        listing_skills_good = listing_skills_good.split(',')
+        listing_skills_soft = ",".join(str(x)[2:-2] for x in skills_listing_soft)
+        listing_skills_soft = listing_skills_soft.split(',')
+        print(listing_skills_soft)
+        cv_skills_result = ", ".join((k + ' : ' + str(v)) for k, v in skills_cv.items())
+        cv_skills_result = cv_skills_result.split(',')
+
         print(cv_skills_result)
+
         return render_template('test.html',
-                               matching_skills=matching_skills,
+                               matching_skills_must=matching_skills_must,
+                               matching_skills_good=matching_skills_good,
+                               matching_skills_soft=matching_skills_soft,
                                cv_skills=cv_skills_result,
-                               listing_skills=listing_skills_result,
-                               matching_skills_len=len(intersection_list),
-                               cv_skills_len=len(skills_cv),
-                               listing_skills_len=len(skills_listing)
+                               listing_skills_must=listing_skills_must,
+                               listing_skills_good=listing_skills_good,
+                               listing_skills_soft=listing_skills_soft,
+                               matching_skills_len_total=intersection_list_total_len,
+                               cv_skills_len=len(skills_cv_list),
+                               listing_skills_len_total=listing_list_total_len,
+                               score=score
                                )
 
     elif request.method == 'GET':

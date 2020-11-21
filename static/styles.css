@@ -17,7 +17,7 @@ p {
   box-sizing: border-box;
 }
 
-.row:after {
+.row:before {
   content: "";
   display: table;
   clear: both;
