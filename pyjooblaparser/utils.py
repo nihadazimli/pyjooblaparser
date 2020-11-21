@@ -78,7 +78,6 @@ def extract_skills(text_raw, noun_chunks,skills_file=None):
             os.path.join(os.path.dirname(__file__), 'updated_u.csv')
 
         )
-        print(data)
 
     else:
         data = pd.read_csv(skills_file)
@@ -128,7 +127,6 @@ def extract_text_from_pdf(pdf_path):
                                       check_extractable=True):
             page_interpreter.process_page(page)
         text = fake_file_handle.getvalue()
-        print(text)
 
     # close open handles
     converter.close()
@@ -153,3 +151,30 @@ def extract_text_from_any(file_path):
         return text
     except KeyError:
         return ' '
+
+
+def cluster_finder(text_raw,this):
+    text = text_raw.strip(":")
+    text = text.lower()
+    text = text.split("\n")
+    file = open(this,"r")
+    file = file.readline()
+    phrases = file.split(",")
+    label = []
+    line = []
+
+    for i in phrases:
+        count = 0
+        for k in text:
+            count = count + 1
+            s = re.findall(i,k)
+            if len(s) > 0 and i!='':
+                label.append(s)
+                ste = re.compile(s[len(s)-1])
+                big = (" ".join(text))
+                t = ste.search(big)
+                ve = t.start()
+                line.append(ve)
+
+    return label,line
+
