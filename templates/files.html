@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>File Upload</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <link rel="stylesheet" href="static/styles.css" >
+    </head>
+
+    <h3>List of properly uploaded CV files</h3>
+
+    <ul>
+        {% for file in cv_files %}
+        <li>
+            <a>
+                {{ file }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    <h3>List of properly uploaded listing files</h3>
+
+    <ul>
+        {% for file in listing_files %}
+        <li>
+            <a>
+                {{ file }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+
+<!--/* Create two equal columns that floats next to each other */-->
+<!--.column {-->
+<!--  float: left;-->
+<!--  width: 33%;-->
+<!--  padding: 10px;-->
+<!--  box-sizing: border-box;-->
+
+<!--}-->
+
+<!--/* Clear floats after the columns */-->
+<!--.row:after {-->
+<!--  content: "sdasdds";-->
+<!--  display: table;-->
+<!--  clear: both;-->
+<!--  box-sizing: border-box;-->
+
+<!--}-->
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="static/styles.css" >
+</head>
+<body>
+
+<h2>Algorithm Results</h2>
+
+<div class="row">
+  <div class="column3" >
+    <h2>Listing</h2>
+    <p>All skills from Listing set are: {{listing_skills}}</p>
+    <p>Count of Listing skills: {{listing_skills_len}}</p>
+  </div>
+    <div class="column3">
+    <h2>Match</h2>
+    <p>Matching words from skill set are: {{matching_skills}}</p>
+    <p>Count of Matching skills: {{matching_skills_len}}</p>
+  </div>
+  <div class="column3" >
+      <h2>CV</h2>
+      <p>All skills from CV set are: {{cv_skills}}</p>
+      <p>Count of CV skills: {{cv_skills_len}}</p>
+  </div>
+</div>
+
+</body>
+</html>

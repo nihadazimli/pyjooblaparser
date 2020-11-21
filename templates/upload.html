@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>File Upload</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <link rel="stylesheet" href="static/styles.css" >
+    </head>
+   <body>
+      <h2>Choose file to upload</h2>
+      <form action = "./uploader" method = "POST"
+         enctype = "multipart/form-data">
+          <input type = "file" name = "file" />
+
+          <div>
+              <input type="radio" id="CV" name="Upload" value="CV">
+              <label for="CV">CV</label><br>
+
+              <input align="center" type="radio" id="Listing" name="Upload" value="Listing">
+              <label for="Listing">Listing</label><br>
+          </div>
+
+         <input type = "submit"/>
+
+
+      <label for="CV">{{ file }}</label><br>
+      </form>
+
+   </body>
+</html>

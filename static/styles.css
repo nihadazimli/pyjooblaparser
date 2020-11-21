@@ -1,0 +1,98 @@
+body {
+  background: White;
+  margin-top: 50px;
+  margin-left: 100px;
+  }
+
+p {
+  font-family: Georgia, serif;
+  font-size: 1.2em;
+  color: DarkSlateGray;
+  }
+
+.column3 {
+  float: left;
+  width: 33.33%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+  box-sizing: border-box;
+}
+
+input[type=button], input[type=submit], input[type=reset] {
+  background-color: #8E44AD;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+button {
+  background-color: #8E44AD;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+input[type=file] {
+  color: #8E44AD;
+  display: inline-block;
+  background: white;
+  border: none;
+  padding: 7px 15px;
+  font-weight: 700;
+  border-radius: 3px;
+  white-space: nowrap;
+  cursor: pointer;
+  font-size: 12pt;
+}
+h1 {
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 2.5em;
+  color: #8E44AD;
+}
+
+h2 {
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 2.0em;
+  color: #8E44AD;
+ }
+
+h3 {
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 1.5em;
+  color: #8E44AD;
+ }
+
+
+ul {
+  list-style: none;
+}
+
+ul li::before {
+  content: "\2022";
+  color: #8E44AD;
+  font-weight: bold;
+  font-size:1.5em;
+
+  display: inline-block;
+  width: 0.5em;
+  margin-left: -1em;
+}
+
+
+

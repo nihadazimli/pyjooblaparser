@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Algorithm File</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <link rel="stylesheet" href="static/styles.css" >
+    </head>
+<body>
+
+<h2>List of files</h2>
+
+<form action="./algorithm_result" method="POST">
+    <h3>List of CV's</h3>
+    {% for file in cv_files %}
+      <input type="radio" id="{{ file }}" name="CV" value="{{ file }}">
+      <label for="{{ file }}">{{ file }}</label><br>
+    {% endfor %}
+    <h3>List of listings</h3>
+    {% for l_file in listing_files %}
+      <input type="radio" id="{{ l_file }}" name="Listing" value="{{ l_file }}">
+      <label for="{{ l_file }}">{{ l_file }}</label><br>
+    {% endfor %}
+
+      <input type = "submit"/>
+
+</form>
+
+
+</body>
+</html>
