@@ -76,7 +76,10 @@ def extract_skills(text_raw, noun_chunks,skills_file=None):
     if not skills_file:
         data = pd.read_csv(
             os.path.join(os.path.dirname(__file__), 'updated_u.csv')
+
         )
+        print(data)
+
     else:
         data = pd.read_csv(skills_file)
     skills = list(data.columns.values)
