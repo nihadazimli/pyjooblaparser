@@ -406,4 +406,3 @@ def extract_experience(experience_list):
             total[count] = {'Experience Name': exp_name, "Month":exp_month}
             count = count + 1
     return total
-

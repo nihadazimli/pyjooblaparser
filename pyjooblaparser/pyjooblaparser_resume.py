@@ -66,3 +66,4 @@ class ResumeParser(object):
         self.__details['total_experience'] = utils.get_total_experience(entities['experience'])
         #self.__details['edu2'] = utils.extract_education2(entities['education'])
         return self
+

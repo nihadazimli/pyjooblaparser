@@ -78,6 +78,24 @@ h3 {
   color: #8E44AD;
  }
 
+ol {
+  list-style: none;
+  counter-reset: my-awesome-counter;
+}
+ol li {
+  counter-increment: my-awesome-counter;
+}
+ol li::before {
+  content: counter(my-awesome-counter) ". ";
+  color: #8E44AD;
+  font-weight: bold;
+  font-size:1.3em;
+  font-family: Georgia, serif;
+  width: 0.5em;
+  margin-left: -1em;
+
+}
+
 
 ul {
   list-style: none;
@@ -88,7 +106,7 @@ ul li::before {
   color: #8E44AD;
   font-weight: bold;
   font-size:1.5em;
-
+  font-family: Georgia, serif;
   display: inline-block;
   width: 0.5em;
   margin-left: -1em;
