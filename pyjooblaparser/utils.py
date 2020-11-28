@@ -23,17 +23,12 @@ MONTHS_SHORT = r'(jan)|(feb)|(mar)|(apr)|(may)|(jun)|(jul)|(aug)|(sep)|(oct)|(no
 MONTHS_LONG = r'(january)|(february)|(march)|(april)|(may)|(june)|(july)|(august)|(september)|(october)|(november)|(december)'
 MONTH = r'(' + MONTHS_SHORT + r'|' + MONTHS_LONG + r')'
 EDUCATION = ['UNIVERSITY','B.E.', 'B.E',"B.Sc", 'ME', 'M.E', 'M.E.', 'MS', 'M.S', 'BTECH', 'MTECH',
-                    'SSC', 'HSC', 'CBSE', 'ICSE', 'X', 'XII','PHD','BS','HIGH SCHOOL','COLLEGE','SCHOOL'
+                    'SSC', 'HSC', 'CBSE', 'ICSE', 'X', 'XII','PHD','BS','HIGH SCHOOL','COLLEGE','SCHOOL','BSC','MSC'
                     ]
 
 RESUME_SECTIONS = [
-                    'accomplishments',
                     'experience',
                     'education',
-                    'interests',
-                    'projects',
-                    'professional experience',
-                    'publications',
                     'skills',
                 ]
 ################################
@@ -239,6 +234,7 @@ def extract_education(nlp_text):
                 education.append((key,biggest))
         else:
             education.append(key)
+
         #print(year.string)
         # if year:
         #     education.append((key, ''.join(year.group(0))))
@@ -246,6 +242,27 @@ def extract_education(nlp_text):
         #     education.append(key)
     return education
 
+# def extract_education2(education_list):
+#     edu = {}
+#     for line in education_list:
+#         line = re.sub(r'[?|$|.|!|,]', r'',line)
+#         words = line.split()
+#         count = 0
+#         for word in words:
+#             count = count + 1
+#             if word.upper() in EDUCATION and word not in STOPWORDS:
+#                 if (word.lower() == 'university'):
+#                     line = words[count-2] + " " + word
+#                 edu[word] = line
+#
+#     return edu
+
+        # if line.upper() in EDUCATION and line not in STOPWORDS:
+        #     if (lnie.lower() == 'university'):
+        #         line = splitted[count - 1] + " " + tex
+        #     edu[tex] = text + nlp_text[index]
+        #
+        # count = count + 1
 
 
 def extract_entity_sections_grad(text):
@@ -255,9 +272,32 @@ def extract_entity_sections_grad(text):
     :param text: Raw text of resume
     :return: dictionary of entities
     '''
+    text = re.sub("/"," ",text)
     text_split = [i.strip() for i in text.split('\n')]
+    text_split2 = text_split
     # sections_in_resume = [i for i in text_split if i.lower() in sections]
     entities = {}
+    count = 0
+    for i in text_split2:
+        count = count + 1
+        experience = re.search(
+        r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present)',
+        i,
+        re.I
+        )
+        if experience:
+            try:
+                if text_split2[count - 1] != '' and text_split2[count - 3] != '' and len(text_split2[count - 1].split()) < 7 :
+                    text_split2[count-3] = text_split2[count - 3]+ " " + text_split2[count-1]
+                    text_split2.pop(count - 1)
+            except IndexError:
+                print("INDEX")
+                # if text_split2[count - 1] == '':
+                #     text_split2 = text_split2[count - 1] + text_split2[count]
+
+
+
+    text_split = text_split2
     key = False
     for phrase in text_split:
         if len(phrase) == 1:
@@ -268,11 +308,13 @@ def extract_entity_sections_grad(text):
             p_key = list(p_key)[0]
         except IndexError:
             pass
-        if p_key in RESUME_SECTIONS:
+        if p_key in RESUME_SECTIONS and entities.get(p_key,0) == 0:
             entities[p_key] = []
             key = p_key
         elif key and phrase.strip():
-            entities[key].append(phrase)
+                entities[key].append(phrase)
+        count = count + 1
+
 
     # entity_key = False
     # for entity in entities.keys():
@@ -364,4 +406,3 @@ def extract_experience(experience_list):
             total[count] = {'Experience Name': exp_name, "Month":exp_month}
             count = count + 1
     return total
-

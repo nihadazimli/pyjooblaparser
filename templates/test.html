@@ -30,11 +30,12 @@
 <h2>Algorithm Results</h2>
 
 <div class="row">
-    <h3>THE SCORE IS {{score}}</h3>
+    <h3>THE SCORE IS {{final_score}}%</h3>
   <div class="column3" >
     <h2>Listing</h2>
       <p>Count of Listing skills: {{listing_skills_len_total}}</p>
-      <h3>Must skills</h3>
+      <h3>Cluster A (Must skills)</h3>
+        <a> Match Count: {{listing_skills_must_count }}</a>
       <ul>
             {% for skill in listing_skills_must %}
             <li>
@@ -44,7 +45,8 @@
             </li>
             {% endfor %}
       </ul>
-      <h3>Good to have skills</h3>
+      <h3>Cluster B (Good to have skills)</h3>
+          <a> Match Count: {{listing_skills_good_count }}</a>
       <ul>
             {% for skill in listing_skills_good %}
             <li>
@@ -54,7 +56,8 @@
             </li>
             {% endfor %}
       </ul>
-      <h3>Soft skills</h3>
+      <h3>Cluster C (Soft skills)</h3>
+      <a> Match Count: {{listing_skills_soft_count }}</a>
       <ul>
             {% for skill in listing_skills_soft %}
             <li>
@@ -68,7 +71,10 @@
     <div class="column3">
     <h2>Match</h2>
     <p>Count of Matching skills: {{matching_skills_len_total}}</p>
-      <h3>Must skills</h3>
+      <h3>Cluster A (Must skills)</h3>
+        <a> Cluster Score: {{score_must}}%</a>
+        <a> Match Count: {{matching_skills_must_count }}</a>
+
       <ul>
             {% for skill in matching_skills_must %}
             <li>
@@ -78,8 +84,12 @@
             </li>
             {% endfor %}
       </ul>
-        <h3>Good to have skills</h3>
+        <h3>Cluster B (Good to have skills)</h3>
+        <a> Cluster Score: {{score_good}}%</a>
+        <a> Match Count: {{matching_skills_good_count }}</a>
+
       <ul>
+
             {% for skill in matching_skills_good %}
             <li>
                 <a>
@@ -88,7 +98,11 @@
             </li>
             {% endfor %}
       </ul>
-        <h3>Soft skills</h3>
+        <h3>Cluster C (Soft skills)</h3>
+        <a> Cluster Score: {{score_soft}}%</a>
+
+        <a> Match Count: {{matching_skills_soft_count}}</a>
+
       <ul>
             {% for skill in matching_skills_soft %}
             <li>
@@ -98,6 +112,18 @@
             </li>
             {% endfor %}
       </ul>
+        <h3>Cluster D (Education)</h3>
+            {{ education}}
+
+        <h3>Cluster E (Experience)</h3>
+      <ol>
+            {% for experience in experience_list %}
+            <li>
+                    {{ experience }}
+            </li>
+            {% endfor %}
+      </ol>
+
   </div>
   <div class="column3" >
       <h2>CV</h2>
@@ -115,7 +141,8 @@
             {% endfor %}
         </ul>
   </div>
-       <p align="center"><a href="./downloads/{{filename}}"><button class=grey style="height:75px;width:150px">Export to Excel</button></a></p>
+    <p align="center"><a href="./downloads/{{excel_filename}}"><button class=grey style="height:75px;width:150px">Export to Excel</button></a></p>
+
 </div>
 
 </body>

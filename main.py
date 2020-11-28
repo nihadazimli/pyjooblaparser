@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, abort, send_file, url_for, send_from_directory
+from flask import Flask, render_template, request, abort, send_file, url_for, send_from_directory, after_this_request
 from werkzeug.utils import secure_filename
 import os
 import config
@@ -86,11 +86,20 @@ def algorithm_result():
         # Do your logic here
         cv_data = ResumeParser(config.UPLOAD_FILES_DIR + config.CV_SUBFOLDER + '/' + cv_name).get_details()
         skills_cv = cv_data['skills']
+        experience = cv_data['experience']
+        education = cv_data['education']
+
+        experience_list = []
+        for x, y in experience.items():
+            if len(y['Experience Name']) > 1:
+                experience_list.append(y['Experience Name'] + " - " + str(y['Month']) + " month")
+            else:
+                experience_list.append("Name cannot be parsed " + " - " + str(y['Month']) + " month")
+
         skills_cv_list = skills_cv.keys()
 
         listing_data = ListingParser(config.UPLOAD_FILES_DIR + config.LISTING_SUBFOLDER + '/' + listing_name)\
             .cluster_divider("./clusters/must_have.txt", "./clusters/good_to_have.txt", "./clusters/soft_skills.txt")
-        print(listing_data)
 
         score = 0
         score_must = 0
@@ -113,8 +122,6 @@ def algorithm_result():
             listing_list_total_len += len(skills_listing_soft)
         else:
             skills_listing_soft = []
-
-        print("skills_cv:", skills_cv_list)
 
         intersection_list_total_len = 0
         try:
@@ -139,14 +146,24 @@ def algorithm_result():
             intersection_list_total_len += len(intersection_list_soft)
             score_soft = len(intersection_list_soft)*config.WEIGHT_SOFT
             score += score_soft
-
         except:
             intersection_list_soft = []
-
 
         matching_skills_must = intersection_list_must
         matching_skills_good = intersection_list_good
         matching_skills_soft = intersection_list_soft
+
+        matching_skills_must_dict = {}
+        for x in matching_skills_must:
+            matching_skills_must_dict[x] = skills_listing_must[x]
+
+        matching_skills_good_dict = {}
+        for x in matching_skills_good:
+            matching_skills_good_dict[x] = skills_listing_good[x]
+
+        matching_skills_soft_dict = {}
+        for x in matching_skills_soft:
+            matching_skills_soft_dict[x] = skills_listing_soft[x]
 
         listing_skills_must = ", ".join((k + ' : ' + str(v)) for k, v in skills_listing_must.items())
         listing_skills_must = listing_skills_must.split(',')
@@ -154,13 +171,19 @@ def algorithm_result():
         listing_skills_good = listing_skills_good.split(',')
         listing_skills_soft = ",".join(str(x)[2:-2] for x in skills_listing_soft)
         listing_skills_soft = listing_skills_soft.split(',')
-        print(listing_skills_soft)
         cv_skills_result = ", ".join((k + ' : ' + str(v)) for k, v in skills_cv.items())
         cv_skills_result = cv_skills_result.split(',')
 
-        print(cv_skills_result)
+        total_score = len(listing_skills_must)*config.WEIGHT_MUST + len(listing_skills_good)*config.WEIGHT_GOOD + \
+                      len(listing_skills_soft)*config.WEIGHT_SOFT
 
-        workbook = xlsxwriter.Workbook('./excel_files/' + cv_name + '.xlsx')
+        final_score = str(score / total_score * 100)[:5]
+        score_must = str((score_must / (len(listing_skills_must) * config.WEIGHT_MUST))*100)[:5]
+        score_good = str((score_good / (len(listing_skills_good) * config.WEIGHT_GOOD))*100)[:5]
+        score_soft = str((score_soft / (len(listing_skills_soft) * config.WEIGHT_SOFT))*100)[:5]
+
+        workbook_filename = cv_name.split('.')[0] + '__' + listing_name.split('.')[0] + '.xlsx'
+        workbook = xlsxwriter.Workbook(app.config['UPLOAD_FOLDER'] + '/' + workbook_filename)
         worksheet = workbook.add_worksheet()
 
         # Widen the first column to make the text clearer.
@@ -196,7 +219,7 @@ def algorithm_result():
         worksheet.write('A2', cv_name)
         worksheet.write('B2', listing_name)
         worksheet.write('C2', '')
-        worksheet.write('D2', score)
+        worksheet.write('D2', final_score)
 
         count = 1
         for k, v in skills_cv.items():
@@ -204,22 +227,22 @@ def algorithm_result():
             worksheet.write('E'+str(count), k + ' : ' + str(v))
 
         count = 1
-        for k, v in skills_listing_must.items():
+        for k, v in matching_skills_must_dict.items():
             count += 1
             worksheet.write('F' + str(count), k + ' : ' + str(v))
         worksheet.write('G2', score_must)
 
         count = 1
-        for k, v in skills_listing_good.items():
+        for k, v in matching_skills_good_dict.items():
             count += 1
             worksheet.write('H' + str(count), k + ' : ' + str(v))
         worksheet.write('I2', score_good)
 
         count = 1
-        for k, v in skills_listing_good.items():
+        for k, v in matching_skills_soft_dict.items():
             count += 1
             worksheet.write('J' + str(count), k + ' : ' + str(v))
-        worksheet.write('K2', score_good)
+        worksheet.write('K2', score_soft)
 
         workbook.close()
 
@@ -227,24 +250,48 @@ def algorithm_result():
                                matching_skills_must=matching_skills_must,
                                matching_skills_good=matching_skills_good,
                                matching_skills_soft=matching_skills_soft,
+                               matching_skills_must_count=len(matching_skills_must),
+                               matching_skills_good_count=len(matching_skills_good),
+                               matching_skills_soft_count=len(matching_skills_soft),
                                cv_skills=cv_skills_result,
                                listing_skills_must=listing_skills_must,
                                listing_skills_good=listing_skills_good,
                                listing_skills_soft=listing_skills_soft,
+                               listing_skills_must_count=len(listing_skills_must),
+                               listing_skills_good_count=len(listing_skills_good),
+                               listing_skills_soft_count=len(listing_skills_soft),
                                matching_skills_len_total=intersection_list_total_len,
                                cv_skills_len=len(skills_cv_list),
                                listing_skills_len_total=listing_list_total_len,
-                               score=score
+                               score=score,
+                               score_must=score_must,
+                               score_good=score_good,
+                               score_soft=score_soft,
+                               excel_filename=workbook_filename,
+                               experience_list=experience_list,
+                               education=education,
+                               final_score=final_score
                                )
 
     elif request.method == 'GET':
         return "Do not try to fool me :)\nYou should upload CV firstly"
 
 
-@app.route('/downloads/<path:filename>')
-def download_file(filename):
-    return send_from_directory("./excel_files",
-                               filename, as_attachment=True)
+@app.route('/downloads/<filename>', methods=['GET', 'POST'])
+def download(filename):
+    uploads = app.config['UPLOAD_FOLDER']
+    file_handle = open(uploads + '/' + filename, 'r')
+
+    @after_this_request
+    def remove_file(response):
+        try:
+            os.remove(uploads + '/' + filename)
+            file_handle.close()
+        except Exception as error:
+            app.logger.error("Error removing or closing downloaded file handle", error)
+        return response
+    return send_from_directory(directory=uploads, filename=filename)
+
 
 if __name__ == '__main__':
     app.run()
