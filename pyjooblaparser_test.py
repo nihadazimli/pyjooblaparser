@@ -2,7 +2,7 @@ from pyjooblaparser import ResumeParser
 from pyjooblaparser import ListingParser
 import pprint
 def main():
-    resume = ResumeParser("./sample_cvs/BK_746_2-converted.pdf")
+    resume = ResumeParser("./sample_cvs/nihad-azimli-resume.pdf")
     text ="./clusters/text.txt"
     listing = ListingParser(text)
     resume_details = resume.get_details()
