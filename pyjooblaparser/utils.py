@@ -27,13 +27,8 @@ EDUCATION = ['UNIVERSITY','B.E.', 'B.E',"B.Sc", 'ME', 'M.E', 'M.E.', 'MS', 'M.S'
                     ]
 
 RESUME_SECTIONS = [
-                    'accomplishments',
                     'experience',
                     'education',
-                    'interests',
-                    'projects',
-                    'professional experience',
-                    'publications',
                     'skills',
                 ]
 ################################
@@ -294,7 +289,7 @@ def extract_entity_sections_grad(text):
         )
         if experience:
             try:
-                if text_split2[count - 1] != '' and text_split2[count - 3] != '':
+                if text_split2[count - 1] != '' and text_split2[count - 3] != '' and len(text_split2[count - 1].split()) < 7 :
                     text_split2[count-3] = text_split2[count - 3]+ " " + text_split2[count-1]
                     text_split2.pop(count - 1)
                 #print(text_split2)
@@ -306,7 +301,6 @@ def extract_entity_sections_grad(text):
 
 
     text_split = text_split2
-    #print("THIS",text_split)
     key = False
     for phrase in text_split:
         if len(phrase) == 1:
@@ -317,11 +311,11 @@ def extract_entity_sections_grad(text):
             p_key = list(p_key)[0]
         except IndexError:
             pass
-        if p_key in RESUME_SECTIONS:
+        if p_key in RESUME_SECTIONS and entities.get(p_key,0) == 0:
             entities[p_key] = []
             key = p_key
         elif key and phrase.strip():
-            entities[key].append(phrase)
+                entities[key].append(phrase)
         count = count + 1
 
 
