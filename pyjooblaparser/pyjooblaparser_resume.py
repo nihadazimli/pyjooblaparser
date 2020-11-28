@@ -20,6 +20,7 @@ class ResumeParser(object):
             'education':None,
             'experience':None,
             'total_experience':None
+            #'edu2':None
         }
         self.__resume = resume
 
@@ -52,12 +53,16 @@ class ResumeParser(object):
 
         # personal_information_seperator_regex = config.PERSONAL_INFORMATION_SEPERATOR
         # personal_information_raw_text = re.split(personal_information_seperator_regex, self.__text_raw.lower())
-        this = self.__nlp
+        #this = self.__nlp
         entities = utils.extract_entity_sections_grad(self.__text_raw)
-        self.__details['education'] = utils.extract_education ([sent.string.strip() for sent in this.sents])
+        #self.__details['education'] = utils.extract_education ([sent.string.strip() for sent in this.sents])
         self.__details['email'] = utils.extract_email(self.__text_raw)
         self.__details['mobile_number'] = utils.extract_number(self.__text_raw)
         self.__details['skills'] = utils.extract_skills(self.__nlp,self.__noun_chunks,None)
         self.__details['experience'] = utils.extract_experience(entities['experience'])
+        nlp = spacy.load('en_core_web_sm')
+        e = nlp('\n'.join(entities['education']))
+        self.__details['education'] = utils.extract_education([sent.string.strip() for sent in e.sents])
         self.__details['total_experience'] = utils.get_total_experience(entities['experience'])
+        #self.__details['edu2'] = utils.extract_education2(entities['education'])
         return self
