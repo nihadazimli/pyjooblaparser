@@ -103,7 +103,8 @@
       <h2>CV</h2>
       <p>Count of CV skills: {{cv_skills_len}}</p>
 
-      <p>All skills from CV set are:
+      <h3>All skills</h3>
+
         <ul>
             {% for skill in cv_skills %}
             <li>
@@ -113,8 +114,8 @@
             </li>
             {% endfor %}
         </ul>
-      </p>
   </div>
+       <p align="center"><a href="./downloads/{{filename}}"><button class=grey style="height:75px;width:150px">Export to Excel</button></a></p>
 </div>
 
 </body>

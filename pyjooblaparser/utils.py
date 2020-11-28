@@ -11,6 +11,32 @@ import io
 import re
 import os
 import pandas as pd
+import datetime
+from dateutil import relativedelta
+from nltk.corpus import stopwords
+
+
+##CONSTANTS###
+STOPWORDS = set(stopwords.words('english'))
+YEAR = r'(((20|19)(\d{2})))'
+MONTHS_SHORT = r'(jan)|(feb)|(mar)|(apr)|(may)|(jun)|(jul)|(aug)|(sep)|(oct)|(nov)|(dec)'
+MONTHS_LONG = r'(january)|(february)|(march)|(april)|(may)|(june)|(july)|(august)|(september)|(october)|(november)|(december)'
+MONTH = r'(' + MONTHS_SHORT + r'|' + MONTHS_LONG + r')'
+EDUCATION = ['UNIVERSITY','B.E.', 'B.E',"B.Sc", 'ME', 'M.E', 'M.E.', 'MS', 'M.S', 'BTECH', 'MTECH',
+                    'SSC', 'HSC', 'CBSE', 'ICSE', 'X', 'XII','PHD','BS','HIGH SCHOOL','COLLEGE','SCHOOL'
+                    ]
+
+RESUME_SECTIONS = [
+                    'accomplishments',
+                    'experience',
+                    'education',
+                    'interests',
+                    'projects',
+                    'professional experience',
+                    'publications',
+                    'skills',
+                ]
+################################
 
 
 def extract_text(resume_full_path, ext):
@@ -177,4 +203,165 @@ def cluster_finder(text_raw,this,soft=False):
     if soft == True:
         return label
     return label,line
+
+
+def extract_education(nlp_text):
+    '''
+    Helper function to extract education from spacy nlp text
+    :param nlp_text: object of `spacy.tokens.doc.Doc`
+    :return: tuple of education degree and year if year if found else only returns education degree
+    '''
+    edu = {}
+    # Extract education degree
+    for index, text in enumerate(nlp_text):
+        count = 0
+        splitted = text.split()
+        for tex in text.split():
+
+            tex = re.sub(r'[?|$|.|!|,]', r'', tex)
+            if tex.upper() in EDUCATION and tex not in STOPWORDS:
+                if (tex.lower() == 'university'):
+                    tex = splitted[count-1] +" "+tex
+                edu[tex] = text + nlp_text[index]
+
+            count = count + 1
+    # Extract year
+    education = []
+    for key in edu.keys():
+        #year = re.search(re.compile(YEAR), edu[key])
+        years = (re.findall(YEAR,edu[key]))
+        biggest = 0
+        for i in years:
+            new = int(i[0])
+            if new > biggest:
+                biggest = new
+        if biggest > 0:
+                education.append((key,biggest))
+        else:
+            education.append(key)
+        #print(year.string)
+        # if year:
+        #     education.append((key, ''.join(year.group(0))))
+        # else:
+        #     education.append(key)
+    return education
+
+
+
+def extract_entity_sections_grad(text):
+    '''
+    Helper function to extract all the raw text from sections of
+    resume specifically for graduates and undergraduates
+    :param text: Raw text of resume
+    :return: dictionary of entities
+    '''
+    text_split = [i.strip() for i in text.split('\n')]
+    # sections_in_resume = [i for i in text_split if i.lower() in sections]
+    entities = {}
+    key = False
+    for phrase in text_split:
+        if len(phrase) == 1:
+            p_key = phrase
+        else:
+            p_key = set(phrase.lower().split()) & set(RESUME_SECTIONS)
+        try:
+            p_key = list(p_key)[0]
+        except IndexError:
+            pass
+        if p_key in RESUME_SECTIONS:
+            entities[p_key] = []
+            key = p_key
+        elif key and phrase.strip():
+            entities[key].append(phrase)
+
+    # entity_key = False
+    # for entity in entities.keys():
+    #     sub_entities = {}
+    #     for entry in entities[entity]:
+    #         if u'\u2022' not in entry:
+    #             sub_entities[entry] = []
+    #             entity_key = entry
+    #         elif entity_key:
+    #             sub_entities[entity_key].append(entry)
+    #     entities[entity] = sub_entities
+
+    # pprint.pprint(entities)
+
+    # make entities that are not found None
+    # for entity in cs.RESUME_SECTIONS:
+    #     if entity not in entities.keys():
+    #         entities[entity] = None
+    return entities
+
+
+def get_total_experience(experience_list):
+    '''
+    Wrapper function to extract total months of experience from a resume
+    :param experience_list: list of experience text extracted
+    :return: total months of experience
+    '''
+    exp_ = []
+    for line in experience_list:
+        experience = re.search(
+            r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present)',
+            line,
+            re.I
+        )
+        if experience:
+            exp_.append(experience.groups())
+    total_exp = sum(
+        [get_number_of_months_from_dates(i[0], i[2]) for i in exp_]
+    )
+    total_experience_in_months = total_exp
+    return total_experience_in_months
+
+
+def get_number_of_months_from_dates(date1, date2):
+    '''
+    Helper function to extract total months of experience from a resume
+    :param date1: Starting date
+    :param date2: Ending date
+    :return: months of experience from date1 to date2
+    '''
+    if date2.lower() == 'present':
+        date2 = datetime.datetime.now().strftime('%b %Y')
+    try:
+        if len(date1.split()[0]) > 3:
+            date1 = date1.split()
+            date1 = date1[0][:3] + ' ' + date1[1]
+        if len(date2.split()[0]) > 3:
+            date2 = date2.split()
+            date2 = date2[0][:3] + ' ' + date2[1]
+    except IndexError:
+        return 0
+    try:
+        date1 = datetime.datetime.strptime(str(date1), '%b %Y')
+        date2 = datetime.datetime.strptime(str(date2), '%b %Y')
+        months_of_experience = relativedelta.relativedelta(date2, date1)
+        months_of_experience = (months_of_experience.years
+                                * 12 + months_of_experience.months)
+    except ValueError:
+        return 0
+    return months_of_experience
+
+
+def extract_experience(experience_list):
+
+    total = {}
+    count = 1
+    for line in experience_list:
+        experience = re.search(
+            r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s(?P<smonth>\w+.\d\d\d\d|present)',
+            line,
+            re.I
+        )
+
+        if experience:
+            exp_name = (line[:experience.start()])
+            exp_ = (experience.groups())
+
+            exp_month = (get_number_of_months_from_dates(exp_[0], exp_[2]))
+            total[count] = {'Experience Name': exp_name, "Month":exp_month}
+            count = count + 1
+    return total
 

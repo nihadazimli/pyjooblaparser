@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, abort, send_file, url_for
+from flask import Flask, render_template, request, abort, send_file, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 import os
 import config
+import xlsxwriter
 import csv
 from pyjooblaparser import ResumeParser
 from pyjooblaparser import ListingParser
@@ -92,6 +93,9 @@ def algorithm_result():
         print(listing_data)
 
         score = 0
+        score_must = 0
+        score_good = 0
+        score_soft = 0
 
         listing_list_total_len = 0
         if type(listing_data['Cluster 1']) is dict:
@@ -116,23 +120,29 @@ def algorithm_result():
         try:
             intersection_list_must = list(set(skills_cv) & set(skills_listing_must.keys()))
             intersection_list_total_len += len(intersection_list_must)
-            score += len(intersection_list_must)*60
+            score_must = len(intersection_list_must)*config.WEIGHT_MUST
+            score += score_must
         except:
             intersection_list_must = {}
 
         try:
             intersection_list_good = list(set(skills_cv) & set(skills_listing_good.keys()))
             intersection_list_total_len += len(intersection_list_good)
-            score += len(intersection_list_good)*30
+            score_good = len(intersection_list_good)*config.WEIGHT_GOOD
+            score += score_good
+
         except:
             intersection_list_good = {}
 
         try:
             intersection_list_soft = list(set(skills_cv) & set(skills_listing_soft))
             intersection_list_total_len += len(intersection_list_soft)
-            score += len(intersection_list_soft)*10
+            score_soft = len(intersection_list_soft)*config.WEIGHT_SOFT
+            score += score_soft
+
         except:
             intersection_list_soft = []
+
 
         matching_skills_must = intersection_list_must
         matching_skills_good = intersection_list_good
@@ -149,6 +159,69 @@ def algorithm_result():
         cv_skills_result = cv_skills_result.split(',')
 
         print(cv_skills_result)
+
+        workbook = xlsxwriter.Workbook('./excel_files/' + cv_name + '.xlsx')
+        worksheet = workbook.add_worksheet()
+
+        # Widen the first column to make the text clearer.
+        worksheet.set_column('A:A', 20)
+        worksheet.set_column('B:B', 20)
+        worksheet.set_column('C:C', 20)
+        worksheet.set_column('D:D', 10)
+        worksheet.set_column('E:E', 20)
+        worksheet.set_column('F:F', 20)
+        worksheet.set_column('G:G', 10)
+        worksheet.set_column('H:H', 20)
+        worksheet.set_column('I:I', 10)
+        worksheet.set_column('J:J', 20)
+        worksheet.set_column('K:K', 10)
+
+        # Add a bold format to use to highlight cells.
+        bold = workbook.add_format({'bold': True})
+
+        # Write some simple text.
+        worksheet.write('A1', 'CV ID', bold)
+        worksheet.write('B1', 'JOB LISTING ID', bold)
+        worksheet.write('C1', 'EXPECTED SCORE', bold)
+        worksheet.write('D1', 'SCORE', bold)
+        worksheet.write('E1', 'CV KEYWORDS', bold)
+        worksheet.write('F1', 'CLUSTER MUST HAVE MATCH', bold)
+        worksheet.write('G1', 'CLUSTER MUST HAVE SCORE', bold)
+        worksheet.write('H1', 'CLUSTER GOOD TO HAVE MATCH', bold)
+        worksheet.write('I1', 'CLUSTER GOOD TO HAVE SCORE', bold)
+        worksheet.write('J1', 'CLUSTER SOFT MATCH', bold)
+        worksheet.write('K1', 'CLUSTER SOFT SCORE', bold)
+
+        # Text with formatting.
+        worksheet.write('A2', cv_name)
+        worksheet.write('B2', listing_name)
+        worksheet.write('C2', '')
+        worksheet.write('D2', score)
+
+        count = 1
+        for k, v in skills_cv.items():
+            count += 1
+            worksheet.write('E'+str(count), k + ' : ' + str(v))
+
+        count = 1
+        for k, v in skills_listing_must.items():
+            count += 1
+            worksheet.write('F' + str(count), k + ' : ' + str(v))
+        worksheet.write('G2', score_must)
+
+        count = 1
+        for k, v in skills_listing_good.items():
+            count += 1
+            worksheet.write('H' + str(count), k + ' : ' + str(v))
+        worksheet.write('I2', score_good)
+
+        count = 1
+        for k, v in skills_listing_good.items():
+            count += 1
+            worksheet.write('J' + str(count), k + ' : ' + str(v))
+        worksheet.write('K2', score_good)
+
+        workbook.close()
 
         return render_template('test.html',
                                matching_skills_must=matching_skills_must,
@@ -167,6 +240,11 @@ def algorithm_result():
     elif request.method == 'GET':
         return "Do not try to fool me :)\nYou should upload CV firstly"
 
+
+@app.route('/downloads/<path:filename>')
+def download_file(filename):
+    return send_from_directory("./excel_files",
+                               filename, as_attachment=True)
 
 if __name__ == '__main__':
     app.run()

@@ -3,3 +3,8 @@ UPLOAD_FILES_DIR = './upload_files'
 CV_SUBFOLDER = '/CV_files'
 LISTING_SUBFOLDER = '/Listing_files'
 
+WEIGHT_MUST = 60
+WEIGHT_GOOD = 30
+WEIGHT_SOFT = 10
+
+
