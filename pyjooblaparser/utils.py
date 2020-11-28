@@ -278,10 +278,8 @@ def extract_entity_sections_grad(text):
     # sections_in_resume = [i for i in text_split if i.lower() in sections]
     entities = {}
     count = 0
-    #print(text_split2)
     for i in text_split2:
         count = count + 1
-        #print("SQQQ",i)
         experience = re.search(
         r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present)',
         i,
@@ -292,7 +290,6 @@ def extract_entity_sections_grad(text):
                 if text_split2[count - 1] != '' and text_split2[count - 3] != '' and len(text_split2[count - 1].split()) < 7 :
                     text_split2[count-3] = text_split2[count - 3]+ " " + text_split2[count-1]
                     text_split2.pop(count - 1)
-                #print(text_split2)
             except IndexError:
                 print("INDEX")
                 # if text_split2[count - 1] == '':
