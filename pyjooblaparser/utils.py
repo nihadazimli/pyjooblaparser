@@ -14,6 +14,7 @@ import pandas as pd
 import datetime
 from dateutil import relativedelta
 from nltk.corpus import stopwords
+import spacy
 
 
 ##CONSTANTS###
@@ -234,13 +235,29 @@ def extract_education(nlp_text):
                 education.append((key,biggest))
         else:
             education.append(key)
+        print("EDU`",len(education))
+    educ = {}
+    count = 0
+    for i in education:
+        print(i)
+        count = count + 1
+
+        if len(i) > 1:
+            if str(i[1]).isnumeric():
+                educ[count] = {"Facility/Title": i[0], 'year': i[1]}
+
+            else:
+                educ[count] = {"Facility/Title": i, 'year': None}
+        else:
+            educ[count] = {"Facility/Title": i,'year': None}
+
 
         #print(year.string)
         # if year:
         #     education.append((key, ''.join(year.group(0))))
         # else:
         #     education.append(key)
-    return education
+    return educ
 
 # def extract_education2(education_list):
 #     edu = {}
@@ -406,3 +423,24 @@ def extract_experience(experience_list):
             total[count] = {'Experience Name': exp_name, "Month":exp_month}
             count = count + 1
     return total
+def get_skill_months(experience_list,text_raw):
+    exp_list = list(experience_list.keys())
+    count = 0
+    mounthly = {}
+    nlp = spacy.load('en_core_web_sm')
+    for i in exp_list:
+
+        if len(exp_list) < count + 1:
+            start = re.search(experience_list[i]['Experience Name'],text_raw)
+            end = re.search(experience_list[i+1]['Experience Name'],text_raw)
+            #        self.__nlp = nlp(self.__text)
+            # self.__noun_chunks = list(self.__nlp.noun_chunks)
+            skills_t = nlp(text_raw[start.start():end.start()])
+            noun_chunks = list(skills_t.noun_chunks)
+            mounthly[experience_list[i]['Experience Name']] =  {"Skills": extract_skills(skills_t, noun_chunks), "Month": experience_list[i]['Month']}
+        else:
+            start = re.search(experience_list[i]['Experience Name'], text_raw)
+            skills_t = nlp(text_raw[start.start():])
+            noun_chunks = list(skills_t.noun_chunks)
+            mounthly[experience_list[i]['Experience Name']] = {"Skills": extract_skills(skills_t, noun_chunks), "Month": experience_list[i]['Month']}
+    return mounthly
