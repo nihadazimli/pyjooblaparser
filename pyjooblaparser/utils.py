@@ -235,11 +235,9 @@ def extract_education(nlp_text):
                 education.append((key,biggest))
         else:
             education.append(key)
-        print("EDU`",len(education))
     educ = {}
     count = 0
     for i in education:
-        print(i)
         count = count + 1
 
         if len(i) > 1:
@@ -429,7 +427,7 @@ def get_skill_months(experience_list,text_raw):
     mounthly = {}
     nlp = spacy.load('en_core_web_sm')
     for i in exp_list:
-
+        print("jib",experience_list[i]['Experience Name'])
         if len(exp_list) < count + 1:
             start = re.search(experience_list[i]['Experience Name'],text_raw)
             end = re.search(experience_list[i+1]['Experience Name'],text_raw)
@@ -437,10 +435,12 @@ def get_skill_months(experience_list,text_raw):
             # self.__noun_chunks = list(self.__nlp.noun_chunks)
             skills_t = nlp(text_raw[start.start():end.start()])
             noun_chunks = list(skills_t.noun_chunks)
-            mounthly[experience_list[i]['Experience Name']] =  {"Skills": extract_skills(skills_t, noun_chunks), "Month": experience_list[i]['Month']}
+            mounthly[count+1] = {'Experience Name':experience_list[i]['Experience Name'],"Skills": extract_skills(skills_t, noun_chunks), "Month":experience_list[i]['Month']}
         else:
             start = re.search(experience_list[i]['Experience Name'], text_raw)
-            skills_t = nlp(text_raw[start.start():])
-            noun_chunks = list(skills_t.noun_chunks)
-            mounthly[experience_list[i]['Experience Name']] = {"Skills": extract_skills(skills_t, noun_chunks), "Month": experience_list[i]['Month']}
+            if start is not None:
+                skills_t = nlp(text_raw[start.start():])
+                noun_chunks = list(skills_t.noun_chunks)
+                mounthly[count+1] = {'Experience Name':experience_list[i]['Experience Name'],"Skills": extract_skills(skills_t, noun_chunks), "Month":experience_list[i]['Month']}
+        count = count+1
     return mounthly
