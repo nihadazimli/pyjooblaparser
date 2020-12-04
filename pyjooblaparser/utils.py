@@ -105,14 +105,30 @@ def extract_skills(text_raw, noun_chunks,skills_file=None):
     skills = list(data.columns.values)
     skillset = {}
     # check for one-grams
+    count = 0
+
     for token in tokens:
-        if token.lower() in skills:
+        first = token.lower()
+        Can_Check = False
+        if count < len(tokens)-1:
+            second = str(tokens[count + 1]).lower()
+            phrase = first + " " + second
+            Can_Check = True
+
+        if phrase in skills and Can_Check:
+            if skillset.get(phrase, -1) == -1:
+                skillset[phrase] = 1
+            else:
+                skillset[phrase] = skillset[phrase] + 1
+            Can_Check = False
+        elif first in skills:
             token = token.lower()
             if skillset.get(token, -1) == -1:
                 skillset[token] = 1
 
             else:
                 skillset[token] = skillset[token] + 1
+        count = count + 1
 
     # check for bi-grams and tri-grams
     for token in noun_chunks:
@@ -427,7 +443,6 @@ def get_skill_months(experience_list,text_raw):
     mounthly = {}
     nlp = spacy.load('en_core_web_sm')
     for i in exp_list:
-        print("jib",experience_list[i]['Experience Name'])
         if len(exp_list) < count + 1:
             start = re.search(experience_list[i]['Experience Name'],text_raw)
             end = re.search(experience_list[i+1]['Experience Name'],text_raw)
@@ -441,6 +456,6 @@ def get_skill_months(experience_list,text_raw):
             if start is not None:
                 skills_t = nlp(text_raw[start.start():])
                 noun_chunks = list(skills_t.noun_chunks)
-                mounthly[count+1] = {'Experience Name':experience_list[i]['Experience Name'],"Skills": extract_skills(skills_t, noun_chunks), "Month":experience_list[i]['Month']}
+                mounthly[count+1] = {'Experience Name': experience_list[i]['Experience Name'],"Skills": extract_skills(skills_t, noun_chunks), "Month":experience_list[i]['Month']}
         count = count+1
     return mounthly
