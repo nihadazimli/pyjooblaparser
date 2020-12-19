@@ -13,7 +13,8 @@ class ListingParser(object):
         listing,
     ):
         self.__details = {
-            'skills': None
+            'skills': None,
+            'years_of_exp':None
         }
         self.__listing = listing
 
@@ -70,4 +71,5 @@ class ListingParser(object):
 
     def __populate_details(self):
         self.__details['skills'] = utils.extract_skills(self.__nlp,self.__noun_chunks,None)
+        self.__details['years_of_exp'] = utils.job_listing_years_ext(self.__text_raw)
         return self

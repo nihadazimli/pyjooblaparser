@@ -27,7 +27,6 @@ def upload_file():
     if request.method == 'POST':
         file = request.files['file']
         file_type = request.form['Upload']
-        print(file_type)
         filename = secure_filename(file.filename)
         if file_type == 'Listing':
             file.save(os.path.join(app.config['UPLOAD_FOLDER'] + config.LISTING_SUBFOLDER, filename))
