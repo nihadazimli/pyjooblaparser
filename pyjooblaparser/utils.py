@@ -31,6 +31,7 @@ RESUME_SECTIONS = [
                     'experience',
                     'education',
                     'skills',
+                    'employment'
                 ]
 ################################
 
@@ -41,8 +42,8 @@ def extract_text(resume_full_path, ext):
     # ext: extension of CV file (e.g. .pdf)
     if ext == '.pdf':
         text_raw = extract_text_from_pdf(resume_full_path)
-    elif ext == '.docx':
-        text_raw = extract_text_from_docx(resume_full_path)
+    # elif ext == '.docx':
+    #     text_raw = extract_text_from_docx(resume_full_path)
     else:
         text_raw = extract_text_from_any(resume_full_path)
 
@@ -81,7 +82,7 @@ def extract_location():
     pass
 
 
-def extract_skills(text_raw, noun_chunks,skills_file=None):
+def extract_skills(text_raw, noun_chunks, skills_file=None):
     # Inputs are:
     # text raw: full string version of CV file
     # skills_file_location: full name and location of skills file (e.g. path\to\skills.csv)
@@ -144,7 +145,6 @@ def extract_skills(text_raw, noun_chunks,skills_file=None):
     return skillset
 
 
-
 def noun_phase_extractor(text_raw):
     # Extract Noun Phrases using  TextBlob Library
     blob = TextBlob(text_raw)
@@ -190,7 +190,7 @@ def extract_text_from_any(file_path):
         return ' '
 
 
-def cluster_finder(text_raw,this,soft=False):
+def cluster_finder(text_raw, this, soft=False):
     text = text_raw.strip(":")
     text = text.lower()
     text = text.split("\n")
@@ -205,16 +205,16 @@ def cluster_finder(text_raw,this,soft=False):
         for k in text:
             count = count + 1
             s = re.findall(i,k)
-            if len(s) > 0 and i!='':
+            if len(s) > 0 and i != '':
                 label.append(s)
                 ste = re.compile(s[len(s)-1])
                 big = (" ".join(text))
                 t = ste.search(big)
                 ve = t.start()
                 line.append(ve)
-    if soft == True:
+    if soft:
         return label
-    return label,line
+    return label, line
 
 
 def extract_education(nlp_text):
@@ -232,8 +232,8 @@ def extract_education(nlp_text):
 
             tex = re.sub(r'[?|$|.|!|,]', r'', tex)
             if tex.upper() in EDUCATION and tex not in STOPWORDS:
-                if (tex.lower() == 'university'):
-                    tex = splitted[count-1] +" "+tex
+                if tex.lower() == 'university':
+                    tex = splitted[count-1] + " " + tex
                 edu[tex] = text + nlp_text[index]
 
             count = count + 1
@@ -241,14 +241,14 @@ def extract_education(nlp_text):
     education = []
     for key in edu.keys():
         #year = re.search(re.compile(YEAR), edu[key])
-        years = (re.findall(YEAR,edu[key]))
+        years = (re.findall(YEAR, edu[key]))
         biggest = 0
         for i in years:
             new = int(i[0])
             if new > biggest:
                 biggest = new
         if biggest > 0:
-                education.append((key,biggest))
+            education.append((key, biggest))
         else:
             education.append(key)
     educ = {}
@@ -263,7 +263,7 @@ def extract_education(nlp_text):
             else:
                 educ[count] = {"Facility/Title": i, 'year': None}
         else:
-            educ[count] = {"Facility/Title": i,'year': None}
+            educ[count] = {"Facility/Title": i, 'year': None}
 
 
         #print(year.string)
@@ -311,23 +311,20 @@ def extract_entity_sections_grad(text):
     count = 0
     for i in text_split2:
         count = count + 1
-        experience = re.search(
-        r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present)',
-        i,
-        re.I
-        )
+        experience = re.search(r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present)', i, re.I)
         if experience:
             try:
-                if text_split2[count - 1] != '' and text_split2[count - 3] != '' and len(text_split2[count - 1].split()) < 7 :
-                    text_split2[count-3] = text_split2[count - 3]+ " " + text_split2[count-1]
+                if text_split2[count - 1] != '' and text_split2[count - 3] != '' \
+                        and len(text_split2[count - 1].split()) < 7:
+                    text_split2[count-3] = text_split2[count - 3] + " " + text_split2[count-1]
+
+                    #print("POPED",text_split2[count-1])
+                    # if (len(text_split2[count-1])<3):
                     text_split2.pop(count - 1)
             except IndexError:
-                print("INDEX")
-                # if text_split2[count - 1] == '':
-                #     text_split2 = text_split2[count - 1] + text_split2[count]
-
-
-
+                #print("Index",text_split2[count - 1] )
+                if text_split2[count - 1] == '':
+                    text_split2 = text_split2[count - 1] + text_split2[count]
     text_split = text_split2
     key = False
     for phrase in text_split:
@@ -339,13 +336,17 @@ def extract_entity_sections_grad(text):
             p_key = list(p_key)[0]
         except IndexError:
             pass
-        if p_key in RESUME_SECTIONS and entities.get(p_key,0) == 0:
+        if p_key in RESUME_SECTIONS and entities.get(p_key, 0) == 0:
             entities[p_key] = []
             key = p_key
         elif key and phrase.strip():
                 entities[key].append(phrase)
         count = count + 1
-
+        try:
+            if len(entities['employment']) > len(entities['experience']):
+                entities['experience'] = entities['employment']
+        except:
+            pass
 
     # entity_key = False
     # for entity in entities.keys():
@@ -423,39 +424,78 @@ def extract_experience(experience_list):
     total = {}
     count = 1
     for line in experience_list:
+
         experience = re.search(
-            r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s(?P<smonth>\w+.\d\d\d\d|present)',
+            r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s(?P<smonth>\w+.\d\d\d\d|present|Present)',
             line,
             re.I
         )
-
         if experience:
+            date_name = line[experience.start():experience.end()]
             exp_name = (line[:experience.start()])
-            exp_ = (experience.groups())
 
-            exp_month = (get_number_of_months_from_dates(exp_[0], exp_[2]))
-            total[count] = {'Experience Name': exp_name, "Month":exp_month}
+            if exp_name == "":
+                print("ZAAA")
+                if count is not 1:
+                    t = re.sub('\s+','',experience_list[count-2])
+                    if t is '':
+                        print("DAA")
+                        s_count = count
+                        while True:
+                            s = re.sub('\s+','',experience_list[s_count])
+                            if s is not '':
+                                break
+                            s_count = s_count + 1
+                        exp_name = experience_list[s_count]
+                        print(exp_name)
+                    else:
+                        exp_name = experience_list[count - 1]
+
+                else:
+                    exp_name = experience_list[count-2]
+
+            exp_ = (experience.groups())
+            if exp_[2] == "Present":
+                exp_n = str(exp_[2]).lower()
+                exp_month = (get_number_of_months_from_dates(exp_[0], exp_n))
+            else:
+                exp_month = (get_number_of_months_from_dates(exp_[0], exp_[2]))
+            total[count] = {'Experience Name': exp_name, "Month": exp_month,"Date_name":date_name}
             count = count + 1
     return total
-def get_skill_months(experience_list,text_raw):
+
+
+def get_skill_months(experience_list, text_raw):
     exp_list = list(experience_list.keys())
     count = 0
     mounthly = {}
     nlp = spacy.load('en_core_web_sm')
     for i in exp_list:
-        if len(exp_list) < count + 1:
-            start = re.search(experience_list[i]['Experience Name'],text_raw)
-            end = re.search(experience_list[i+1]['Experience Name'],text_raw)
+        if len(exp_list) > count+1:
+            start = re.search(experience_list[i]['Date_name'], text_raw)
+            end = re.search(experience_list[i+1]['Date_name'], text_raw)
             #        self.__nlp = nlp(self.__text)
             # self.__noun_chunks = list(self.__nlp.noun_chunks)
-            skills_t = nlp(text_raw[start.start():end.start()])
+            try:
+                skills_t = nlp(text_raw[start.start():end.start()])
+            except AttributeError:
+                #print("STRING EXP",experience_list[i]['Experience Name'])
+                count = count + 1
+                continue
             noun_chunks = list(skills_t.noun_chunks)
-            mounthly[count+1] = {'Experience Name':experience_list[i]['Experience Name'],"Skills": extract_skills(skills_t, noun_chunks), "Month":experience_list[i]['Month']}
+            mounthly[count+1] = {'Experience Name': experience_list[i]['Experience Name'],
+                                 "Skills": extract_skills(skills_t, noun_chunks),
+                                 "Month": experience_list[i]['Month']}
         else:
-            start = re.search(experience_list[i]['Experience Name'], text_raw)
+            start = re.search(experience_list[i]['Date_name'], text_raw)
             if start is not None:
                 skills_t = nlp(text_raw[start.start():])
                 noun_chunks = list(skills_t.noun_chunks)
-                mounthly[count+1] = {'Experience Name': experience_list[i]['Experience Name'],"Skills": extract_skills(skills_t, noun_chunks), "Month":experience_list[i]['Month']}
+                mounthly[count+1] = {'Experience Name': experience_list[i]['Experience Name'],
+                                     "Skills": extract_skills(skills_t, noun_chunks),
+                                     "Month": experience_list[i]['Month']}
         count = count+1
     return mounthly
+
+def job_listing_years_ext(text_raw):
+    pass
