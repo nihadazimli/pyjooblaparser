@@ -24,9 +24,13 @@ MONTHS_SHORT = r'(jan)|(feb)|(mar)|(apr)|(may)|(jun)|(jul)|(aug)|(sep)|(oct)|(no
 MONTHS_LONG = r'(january)|(february)|(march)|(april)|(may)|(june)|(july)|(august)|(september)|(october)|(november)|(december)'
 MONTH = r'(' + MONTHS_SHORT + r'|' + MONTHS_LONG + r')'
 EDUCATION = ['UNIVERSITY','B.E.', 'B.E',"B.Sc", 'ME', 'M.E', 'M.E.', 'MS', 'M.S', 'BTECH', 'MTECH',
-                    'SSC', 'HSC', 'CBSE', 'ICSE', 'X', 'XII','PHD','BS','HIGH SCHOOL','COLLEGE','SCHOOL','BSC','MSC'
-                    ]
-
+             'SSC', 'HSC', 'CBSE', 'ICSE', 'X', 'XII','PHD','BS','HIGH SCHOOL','COLLEGE','SCHOOL','BSC','MSC'
+             ]
+SENIORITY = ['junior',
+             'senior',
+             'mid',
+             'years of experience'
+            ]
 RESUME_SECTIONS = [
                     'experience',
                     'education',
@@ -435,11 +439,9 @@ def extract_experience(experience_list):
             exp_name = (line[:experience.start()])
 
             if exp_name == "":
-                print("ZAAA")
                 if count is not 1:
                     t = re.sub('\s+','',experience_list[count-2])
                     if t is '':
-                        print("DAA")
                         s_count = count
                         while True:
                             s = re.sub('\s+','',experience_list[s_count])
@@ -447,7 +449,6 @@ def extract_experience(experience_list):
                                 break
                             s_count = s_count + 1
                         exp_name = experience_list[s_count]
-                        print(exp_name)
                     else:
                         exp_name = experience_list[count - 1]
 
@@ -498,4 +499,60 @@ def get_skill_months(experience_list, text_raw):
     return mounthly
 
 def job_listing_years_ext(text_raw):
-    pass
+    text_raw_l =text_raw.lower()
+    # seniority = SENIORITY
+    # for key in seniority.key().lower():
+    #     exp = re.search(key,text_raw.lowe_l)
+    #     if exp:
+    exp = {}
+    for index, text in enumerate(text_raw):
+        count = 0
+        splitted = text.split()
+        for tex in text.split():
+
+            tex = re.sub(r'[?|$|.|!|,]', r'', tex)
+            if tex.upper() in SENIORITY and tex not in STOPWORDS:
+                if tex.lower() == 'university':
+                    tex = splitted[count-1] + " " + tex
+                exp[tex] = text + text_raw[index]
+            count = count + 1
+
+
+def job_listing_years_ext(text_raw):
+    text_raw_l = text_raw.lower()
+    exp = None
+    text_raw_l = re.sub(r'[?|$|.|!|,]', r'', text_raw_l)
+    text_raw_l = text_raw_l.split("\n")
+    for i in text_raw_l:
+        for word in SENIORITY:
+            found = re.search(word, i)
+            if found:
+                found_str = i[found.start():found.end()]
+                if found_str == "years of experience" and found.start()-5 > 0:
+                    target = i[found.start()-5:found.end()]
+                    year = re.search("\d\d|\d",target)
+                    year = target[year.start():year.end()]
+                    return year
+                elif found_str == "years of experience" and found.start()-4 > 0:
+                    target = i[found.start()-4:found.end()]
+                    year = re.search("\d\d|\d",target)
+                    year = target[year.start():year.end()]
+                    return year
+                elif found_str == "years of experience" and found.start() - 3 > 0:
+                    target = i[found.start() - 3:found.end()]
+                    year = re.search("\d\d|\d", target)
+                    year = target[year.start():year.end()]
+                    return year
+                elif found_str == "years of experience" and found.start() - 2 > 0:
+                    target = i[found.start() - 2:found.end()]
+                    year = re.search("\d\d|\d", target)
+                    year = target[year.start():year.end()]
+                    return year
+                elif found_str == "junior":
+                    exp = 2
+                elif found_str == "mid":
+                    exp = 3
+                elif found_str == "senior":
+                    exp = 5
+
+    return exp
