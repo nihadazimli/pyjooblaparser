@@ -59,14 +59,17 @@ class ResumeParser(object):
         self.__details['email'] = utils.extract_email(self.__text_raw)
         self.__details['mobile_number'] = utils.extract_number(self.__text_raw)
         self.__details['skills'] = utils.extract_skills(self.__nlp,self.__noun_chunks,None)
+        #print(self.__text_raw)
         ex = utils.extract_experience(entities['experience'])
+
         #self.__details['experience'] = ex
         nlp = spacy.load('en_core_web_sm')
         e = nlp('\n'.join(entities['education']))
         self.__details['education'] = utils.extract_education([sent.string.strip() for sent in e.sents])
         self.__details['total_experience'] = utils.get_total_experience(entities['experience'])
-        print(utils.get_skill_months(ex,self.__text_raw))
+        #print(utils.get_skill_months(ex,self.__text_raw))
         self.__details['experience'] = utils.get_skill_months(ex,self.__text_raw)
+        #print("EXPER",entities['experience'])
         #self.__details['edu2'] = utils.extract_education2(entities['education'])
         return self
 

@@ -11,7 +11,6 @@ class ListingParser(object):
     def __init__(
         self,
         listing,
-        skills_file=None,
     ):
         self.__details = {
             'skills': None
@@ -31,7 +30,6 @@ class ListingParser(object):
         nlp = spacy.load('en_core_web_sm')
 
         self.__text_raw = utils.extract_text(self.__listing, ext)
-
         self.__text = ' '.join(self.__text_raw.split())
         self.__nlp = nlp(self.__text)
         self.__noun_chunks = list(self.__nlp.noun_chunks)
