@@ -29,7 +29,9 @@ EDUCATION = ['UNIVERSITY','B.E.', 'B.E',"B.Sc", 'ME', 'M.E', 'M.E.', 'MS', 'M.S'
 SENIORITY = ['junior',
              'senior',
              'mid',
-             'years of experience'
+             'years of experience',
+             'years of professional experience',
+             'years\' experience in'
             ]
 RESUME_SECTIONS = [
                     'experience',
@@ -528,26 +530,67 @@ def job_listing_years_ext(text_raw):
             found = re.search(word, i)
             if found:
                 found_str = i[found.start():found.end()]
-                if found_str == "years of experience" and found.start()-5 > 0:
-                    target = i[found.start()-5:found.end()]
-                    year = re.search("\d\d|\d",target)
-                    year = target[year.start():year.end()]
-                    return year
-                elif found_str == "years of experience" and found.start()-4 > 0:
-                    target = i[found.start()-4:found.end()]
-                    year = re.search("\d\d|\d",target)
-                    year = target[year.start():year.end()]
-                    return year
-                elif found_str == "years of experience" and found.start() - 3 > 0:
-                    target = i[found.start() - 3:found.end()]
-                    year = re.search("\d\d|\d", target)
-                    year = target[year.start():year.end()]
-                    return year
-                elif found_str == "years of experience" and found.start() - 2 > 0:
-                    target = i[found.start() - 2:found.end()]
-                    year = re.search("\d\d|\d", target)
-                    year = target[year.start():year.end()]
-                    return year
+                if found_str == "years of experience" or found_str == "years of professional experience" or found_str == "years\' experience in" :
+                    before_keyword = i[:found.start()].split()
+                    if len(before_keyword)>1:
+                        if before_keyword[-2] == 'to' or before_keyword[-2] == 'than' or before_keyword[-2] == 'of':
+                            before_keyword[-2] = before_keyword[-3]
+                        experience_definition = before_keyword[-2:]
+                    elif len(before_keyword)>0:
+                        experience_definition = before_keyword[-1:]
+                    else:
+                        return None
+                    experience_definition = ' '.join(experience_definition)
+                    year = re.search(r"([0-9]+\-[0-9]+)|([a-z]+ [0-9(-^)]+\+|[a-z]+ [0-9]+[^-])|([0-9]+[^-]\+|[0-9]+)|([a-z]+\. [0-9])",experience_definition)
+
+                    # year = experience_definition[year.start():year.end()]
+                    exp = {}
+                    if year:
+                        if year.group(1):
+                            print("I am in group 1")
+                            year = year.group(1).split('-')
+                            exp = {"min":year[0],'max':year[1]}
+                            return exp
+
+                        if year.group(2):
+                            print("I am in group 2")
+                            # for phrases as min of less, than up to
+                            min_key = ['min','minimum','least','more']
+                            max_key = ['max','maximum','less','up']
+                            matched_str = year.group(2)
+                            matched_str = matched_str.split()
+                            phrase = matched_str[0]
+                            if phrase in min_key:
+                                exp = {"min":matched_str[1], 'max':"100"}
+                            elif phrase in max_key:
+                                exp = {"min": '0', 'max': matched_str[1]}
+                            else:
+                                if matched_str[1][-1] == '+':
+                                    exp = {"min": matched_str[1][:-1], 'max': "100"}
+                                else:
+                                    exp = {"min": matched_str[1], "max": matched_str[1]}
+
+                                print(year.group(2),"group 2 ext")
+
+
+                        if year.group(3):
+                            print("I am in group 3")
+                            year = year.group(3)
+                            if year[-1] == '+':
+                                year = year[:-1]
+                                exp = {'min':year,'max':'100'}
+                            else:
+                                exp = {'min':year,'max':year}
+                            return exp
+                        # if year.group(4):
+                        #     print("I am in group 4")
+                        #     year = year.group(4).split()
+                        #     if year[0] == 'min.':
+                        #         exp = {'min':year[1],'max':"100"}
+                        #     elif year[0] == 'max.':
+                        #         exp = {'min': 0, 'max': year[1]}
+                        #     else:
+                        #         print("group 4 exit")
                 elif found_str == "junior":
                     exp = 2
                 elif found_str == "mid":
@@ -555,4 +598,17 @@ def job_listing_years_ext(text_raw):
                 elif found_str == "senior":
                     exp = 5
 
+    # 10-15 years of experience
+    # minimum 3 years of experience
+    # 10+ years of experience
+    # max. 2 years of experience
+    # minumum of 3 years of experience
+    # least 3 years
+    # up to 5 years  years of experience
+    # more than 5 years of experience
+    # less than 5 years of experience
+    # mnihad. 5 years of experience
+    # nihad 5 years of experience
+    # nihad 5-10 years of exp
     return exp
+
