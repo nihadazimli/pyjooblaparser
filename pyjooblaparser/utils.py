@@ -547,7 +547,6 @@ def job_listing_years_ext(text_raw):
                     exp = {}
                     if year:
                         if year.group(1):
-                            print("I am in group 1")
                             year = year.group(1).split('-')
                             exp = {"min":year[0],'max':year[1]}
                             return exp
@@ -570,11 +569,11 @@ def job_listing_years_ext(text_raw):
                                 else:
                                     exp = {"min": matched_str[1], "max": matched_str[1]}
 
-                                print(year.group(2),"group 2 ext")
+                                # print(year.group(2),"group 2 ext")
 
 
                         if year.group(3):
-                            print("I am in group 3")
+                            # print("I am in group 3")
                             year = year.group(3)
                             if year[-1] == '+':
                                 year = year[:-1]

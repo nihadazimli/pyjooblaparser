@@ -19,7 +19,7 @@ class ResumeParser(object):
             'skills': None,
             'education':None,
             'experience':None,
-            'total_experience':None
+            'total_experience': None
             #'edu2':None
         }
         self.__resume = resume
@@ -47,6 +47,7 @@ class ResumeParser(object):
         return self.__details
 
     def get_full_raw_text(self):
+
         return self.__text_raw
 
     def __populate_details(self):

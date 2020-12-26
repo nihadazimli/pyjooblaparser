@@ -14,7 +14,7 @@ class ListingParser(object):
     ):
         self.__details = {
             'skills': None,
-            'years_of_exp':None
+            'years_of_exp': None
         }
         self.__listing = listing
 
@@ -34,6 +34,8 @@ class ListingParser(object):
         self.__text = ' '.join(self.__text_raw.split())
         self.__nlp = nlp(self.__text)
         self.__noun_chunks = list(self.__nlp.noun_chunks)
+
+        self.__populate_details()
 
     def cluster_divider(self, file1, file2, file3):
         nlp = spacy.load('en_core_web_sm')
@@ -64,12 +66,16 @@ class ListingParser(object):
             skills = {"Cluster 1": must_skills, "Cluster 2":None}
         # nlp_soft = nlp(text)
         # noun_chunks_must = list(nlp_soft.noun_chunks)
-        soft_skills =  utils.cluster_finder(text, file3, True)
+        soft_skills = utils.cluster_finder(text, file3, True)
         skills['Cluster 3'] = soft_skills
 
         return skills
 
     def __populate_details(self):
-        self.__details['skills'] = utils.extract_skills(self.__nlp,self.__noun_chunks,None)
+        self.__details['skills'] = utils.extract_skills(self.__nlp, self.__noun_chunks,None)
         self.__details['years_of_exp'] = utils.job_listing_years_ext(self.__text_raw)
         return self
+
+
+    def get_details(self):
+        return self.__details
