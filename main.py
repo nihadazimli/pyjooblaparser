@@ -116,7 +116,7 @@ def algorithm_result():
         listing_years = listing_details['years_of_exp']
 
         MODERATING_VALUE = 1
-        dynamic_weighting_denominator = abs(listing_years['min']*12-total_exp_month)*MODERATING_VALUE
+        dynamic_weighting_denominator = abs(int(listing_years['min'])*12-int(total_exp_month))*MODERATING_VALUE
 
 
         listing_list_total_len = 0

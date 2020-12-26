@@ -15,7 +15,7 @@ import datetime
 from dateutil import relativedelta
 from nltk.corpus import stopwords
 import spacy
-
+import time
 
 ##CONSTANTS###
 STOPWORDS = set(stopwords.words('english'))
@@ -40,9 +40,10 @@ RESUME_SECTIONS = [
                     'employment'
                 ]
 ################################
-
-
+strt_time = 0
+end_time = 0
 def extract_text(resume_full_path, ext):
+    strt_time = datetime.datetime.now()
     # INPUTS
     # resume_full_path: full file path of CV
     # ext: extension of CV file (e.g. .pdf)
@@ -52,7 +53,8 @@ def extract_text(resume_full_path, ext):
     #     text_raw = extract_text_from_docx(resume_full_path)
     else:
         text_raw = extract_text_from_any(resume_full_path)
-
+    end_time = datetime.datetime.now() - strt_time
+    print("EXTR TXT",end_time)
     return text_raw
 
 
@@ -89,6 +91,7 @@ def extract_location():
 
 
 def extract_skills(text_raw, noun_chunks, skills_file=None):
+    strt_time = datetime.datetime.now()
     # Inputs are:
     # text raw: full string version of CV file
     # skills_file_location: full name and location of skills file (e.g. path\to\skills.csv)
@@ -147,18 +150,24 @@ def extract_skills(text_raw, noun_chunks, skills_file=None):
 
             else:
                 skillset[token] = skillset[token] + 1
-
+    end_time = datetime.datetime.now() - strt_time
+    print("EXTR SKILLS",end_time)
     return skillset
 
 
 def noun_phase_extractor(text_raw):
+    strt_time = datetime.datetime.now()
+
     # Extract Noun Phrases using  TextBlob Library
     blob = TextBlob(text_raw)
     nouns = blob.noun_phrases
+    end_time = datetime.datetime.now() - strt_time
+    print("Phrase EXTR",end_time)
     return nouns
 
 
 def extract_text_from_pdf(pdf_path):
+    strt_time = datetime.datetime.now()
     resource_manager = PDFResourceManager()
     fake_file_handle = io.StringIO()
     converter = TextConverter(resource_manager, fake_file_handle, laparams=LAParams())
@@ -174,29 +183,39 @@ def extract_text_from_pdf(pdf_path):
     # close open handles
     converter.close()
     fake_file_handle.close()
-
+    end_time = datetime.datetime.now() - strt_time
+    print("EXTRACT TEXT")
     if text:
         return text
 
 
 def extract_text_from_docx(docx_path):
+    strt_time = datetime.datetime.now()
     try:
         temp = docx2txt.process(docx_path)
         text = [line.replace('\t', ' ') for line in temp.split('\n') if line]
+        end_time = datetime.datetime.now() - strt_time
+        print("From docx", end_time)
         return ' '.join(text)
     except KeyError:
+
         return ' '
 
 
 def extract_text_from_any(file_path):
+    strt_time = datetime.datetime.now()
     try:
         text = textract.process(file_path).decode('utf-8')
+        end_time = datetime.datetime.now() - strt_time
+        print("FROM ANY ", end_time)
         return text
+
     except KeyError:
         return ' '
 
 
 def cluster_finder(text_raw, this, soft=False):
+    strt_time = datetime.datetime.now()
     text = text_raw.strip(":")
     text = text.lower()
     text = text.split("\n")
@@ -220,10 +239,13 @@ def cluster_finder(text_raw, this, soft=False):
                 line.append(ve)
     if soft:
         return label
+    end_time = datetime.datetime.now() - strt_time
+    print("CLuster finder",end_time)
     return label, line
 
 
 def extract_education(nlp_text):
+    strt_time = datetime.datetime.now()
     '''
     Helper function to extract education from spacy nlp text
     :param nlp_text: object of `spacy.tokens.doc.Doc`
@@ -277,6 +299,8 @@ def extract_education(nlp_text):
         #     education.append((key, ''.join(year.group(0))))
         # else:
         #     education.append(key)
+    end_time = datetime.datetime.now() - strt_time
+    print("EDUCATION",end_time)
     return educ
 
 # def extract_education2(education_list):
@@ -303,6 +327,7 @@ def extract_education(nlp_text):
 
 
 def extract_entity_sections_grad(text):
+    strt_time = datetime.datetime.now()
     '''
     Helper function to extract all the raw text from sections of
     resume specifically for graduates and undergraduates
@@ -371,10 +396,13 @@ def extract_entity_sections_grad(text):
     # for entity in cs.RESUME_SECTIONS:
     #     if entity not in entities.keys():
     #         entities[entity] = None
+    end_time = datetime.datetime.now() - strt_time
+    print("Entity ext",end_time)
     return entities
 
 
 def get_total_experience(experience_list):
+    strt_time = datetime.datetime.now()
     '''
     Wrapper function to extract total months of experience from a resume
     :param experience_list: list of experience text extracted
@@ -393,10 +421,13 @@ def get_total_experience(experience_list):
         [get_number_of_months_from_dates(i[0], i[2]) for i in exp_]
     )
     total_experience_in_months = total_exp
+    end_time = datetime.datetime.now() - strt_time
+    print("total exp",end_time)
     return total_experience_in_months
 
 
 def get_number_of_months_from_dates(date1, date2):
+    strt_time = datetime.datetime.now()
     '''
     Helper function to extract total months of experience from a resume
     :param date1: Starting date
@@ -422,11 +453,14 @@ def get_number_of_months_from_dates(date1, date2):
                                 * 12 + months_of_experience.months)
     except ValueError:
         return 0
+    end_time = datetime.datetime.now() - strt_time
+    print("Number of month",end_time)
     return months_of_experience
 
 
 def extract_experience(experience_list):
 
+    strt_time = datetime.datetime.now()
     total = {}
     count = 1
     for line in experience_list:
@@ -465,20 +499,21 @@ def extract_experience(experience_list):
                 exp_month = (get_number_of_months_from_dates(exp_[0], exp_[2]))
             total[count] = {'Experience Name': exp_name, "Month": exp_month,"Date_name":date_name}
             count = count + 1
+    end_time = datetime.datetime.now() - strt_time
+    print("EXT EXPERIENCE",end_time)
     return total
 
 
-def get_skill_months(experience_list, text_raw):
+def get_skill_months(experience_list, text_raw,nlp):
+    strt_time = datetime.datetime.now()
     exp_list = list(experience_list.keys())
     count = 0
     mounthly = {}
-    nlp = spacy.load('en_core_web_sm')
+
     for i in exp_list:
         if len(exp_list) > count+1:
             start = re.search(experience_list[i]['Date_name'], text_raw)
-            end = re.search(experience_list[i+1]['Date_name'], text_raw)
-            #        self.__nlp = nlp(self.__text)
-            # self.__noun_chunks = list(self.__nlp.noun_chunks)
+            end = re.search(experience_list[i+1]['Date_name'], text_raw[start.start():])
             try:
                 skills_t = nlp(text_raw[start.start():end.start()])
             except AttributeError:
@@ -498,29 +533,16 @@ def get_skill_months(experience_list, text_raw):
                                      "Skills": extract_skills(skills_t, noun_chunks),
                                      "Month": experience_list[i]['Month']}
         count = count+1
+    end_time = datetime.datetime.now() - strt_time
+    print("GET SKILL MONTH",end_time)
+
     return mounthly
 
-def job_listing_years_ext(text_raw):
-    text_raw_l =text_raw.lower()
-    # seniority = SENIORITY
-    # for key in seniority.key().lower():
-    #     exp = re.search(key,text_raw.lowe_l)
-    #     if exp:
-    exp = {}
-    for index, text in enumerate(text_raw):
-        count = 0
-        splitted = text.split()
-        for tex in text.split():
 
-            tex = re.sub(r'[?|$|.|!|,]', r'', tex)
-            if tex.upper() in SENIORITY and tex not in STOPWORDS:
-                if tex.lower() == 'university':
-                    tex = splitted[count-1] + " " + tex
-                exp[tex] = text + text_raw[index]
-            count = count + 1
 
 
 def job_listing_years_ext(text_raw):
+    strt_time = datetime.datetime.now()
     text_raw_l = text_raw.lower()
     exp = None
     text_raw_l = re.sub(r'[?|$|.|!|,]', r'', text_raw_l)
@@ -609,5 +631,7 @@ def job_listing_years_ext(text_raw):
     # mnihad. 5 years of experience
     # nihad 5 years of experience
     # nihad 5-10 years of exp
+    end_time = datetime.datetime.now() - strt_time
+    print("JOB LISTING YEARS EXT",end_time)
     return exp
 
