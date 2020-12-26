@@ -97,13 +97,27 @@ def algorithm_result():
 
         skills_cv_list = skills_cv.keys()
 
-        listing_data = ListingParser(config.UPLOAD_FILES_DIR + config.LISTING_SUBFOLDER + '/' + listing_name)\
-            .cluster_divider("./clusters/must_have.txt", "./clusters/good_to_have.txt", "./clusters/soft_skills.txt")
+        listing = ListingParser(config.UPLOAD_FILES_DIR + config.LISTING_SUBFOLDER + '/' + listing_name)
+        listing_data = listing.cluster_divider("./clusters/must_have.txt", "./clusters/good_to_have.txt", "./clusters/soft_skills.txt")
+        listing_details = listing.get_details()
+
 
         score = 0
         score_must = 0
         score_good = 0
         score_soft = 0
+
+        #Jobseeker Total exp month
+        total_exp_month = 0
+        for i in experience:
+            total_exp_month = total_exp_month + experience[i]['Month']
+
+        # JobList Total Min/Max Calculator
+        listing_years = listing_details['years_of_exp']
+
+        MODERATING_VALUE = 1
+        dynamic_weighting_denominator = abs(listing_years['min']*12-total_exp_month)*MODERATING_VALUE
+
 
         listing_list_total_len = 0
         if type(listing_data['Cluster 1']) is dict:
