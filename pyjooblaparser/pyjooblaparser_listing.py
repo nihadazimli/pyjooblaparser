@@ -5,6 +5,8 @@ from . import utils
 from . import config
 import spacy
 
+nlp = spacy.load('en_core_web_sm')
+
 
 class ListingParser(object):
 
@@ -28,7 +30,7 @@ class ListingParser(object):
         else:
             ext = '.' + self.__listing.name.split('.')[1]
 
-        nlp = spacy.load('en_core_web_sm')
+        global nlp
 
         self.__text_raw = utils.extract_text(self.__listing, ext)
         self.__text = ' '.join(self.__text_raw.split())
@@ -38,7 +40,7 @@ class ListingParser(object):
         self.__populate_details()
 
     def cluster_divider(self, file1, file2, file3):
-        nlp = spacy.load('en_core_web_sm')
+        global nlp
         string_must, must_index = utils.cluster_finder(self.__text_raw, file1)
         string_good, good_index = utils.cluster_finder(self.__text_raw, file2)
         text = self.__text_raw
@@ -72,7 +74,6 @@ class ListingParser(object):
         return skills
 
     def __populate_details(self):
-        self.__details['skills'] = utils.extract_skills(self.__nlp, self.__noun_chunks,None)
         self.__details['years_of_exp'] = utils.job_listing_years_ext(self.__text_raw)
         return self
 
