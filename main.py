@@ -27,6 +27,7 @@ def upload_file():
     if request.method == 'POST':
         file = request.files['file']
         file_type = request.form['Upload']
+        print(file_type)
         filename = secure_filename(file.filename)
         if file_type == 'Listing':
             file.save(os.path.join(app.config['UPLOAD_FOLDER'] + config.LISTING_SUBFOLDER, filename))
@@ -65,6 +66,79 @@ def dir_listing(req_path):
     return render_template('files.html', cv_files=cv_files, listing_files=listing_files)
 
 
+@app.route('/new_test')
+def new_test():
+    return render_template('new_test.html')
+
+
+@app.route('/new_test_run', methods=['GET', 'POST'])
+def new_test_run():
+    if request.method == 'POST':
+
+        score = 0
+
+        file_cv = request.files['CV']
+        filename_cv = secure_filename(file_cv.filename)
+        file_cv.save(os.path.join(app.config['UPLOAD_FOLDER'] + config.CV_SUBFOLDER, filename_cv))
+
+        file_listing = request.files['LISTING']
+        filename_listing = secure_filename(file_listing.filename)
+        file_listing.save(os.path.join(app.config['UPLOAD_FOLDER'] + config.LISTING_SUBFOLDER, filename_listing))
+
+        cv_data = ResumeParser(config.UPLOAD_FILES_DIR + config.CV_SUBFOLDER + '/' + filename_cv).get_details()
+        skills_cv = cv_data['skills']
+
+        listing_data = ListingParser(config.UPLOAD_FILES_DIR + config.LISTING_SUBFOLDER + '/' + filename_listing) \
+            .cluster_divider("./clusters/must_have.txt", "./clusters/good_to_have.txt", "./clusters/soft_skills.txt")
+
+        if type(listing_data['Cluster 1']) is dict:
+            skills_listing_must = listing_data['Cluster 1']
+        else:
+            skills_listing_must = {}
+        if type(listing_data['Cluster 2']) is dict:
+            skills_listing_good = listing_data['Cluster 2']
+        else:
+            skills_listing_good = {}
+        if type(listing_data['Cluster 3']) is list:
+            skills_listing_soft = listing_data['Cluster 3']
+        else:
+            skills_listing_soft = []
+
+        try:
+            intersection_list_must = list(set(skills_cv) & set(skills_listing_must.keys()))
+            score_must = len(intersection_list_must)*config.WEIGHT_MUST
+            score += score_must
+        except:
+            intersection_list_must = {}
+
+        try:
+            intersection_list_good = list(set(skills_cv) & set(skills_listing_good.keys()))
+            score_good = len(intersection_list_good)*config.WEIGHT_GOOD
+            score += score_good
+
+        except:
+            intersection_list_good = {}
+
+        try:
+            intersection_list_soft = list(set(skills_cv) & set(skills_listing_soft))
+            score_soft = len(intersection_list_soft)*config.WEIGHT_SOFT
+            score += score_soft
+        except:
+            intersection_list_soft = []
+
+        total_score = len(skills_listing_must) * config.WEIGHT_MUST + len(
+                skills_listing_good) * config.WEIGHT_GOOD + \
+                          len(skills_listing_soft) * config.WEIGHT_SOFT
+
+        final_score = str(score / total_score * 100)[:5]
+
+        return render_template('new_test_run.html',
+                           final_score=final_score)
+    elif request.method == 'GET':
+        return "ASDASDASD"
+
+
+
 @app.route('/tryAlgo')
 def try_algo():
     CV_DIR = config.UPLOAD_FILES_DIR + config.CV_SUBFOLDER
@@ -89,35 +163,26 @@ def algorithm_result():
         education = cv_data['education']
 
         experience_list = []
+        experience_skills_list_total = []
         for x, y in experience.items():
             if len(y['Experience Name']) > 1:
                 experience_list.append(y['Experience Name'] + " - " + str(y['Month']) + " month")
+                experience_skills_str = ", ".join((k + ' : ' + str(v)) for k, v in y['Skills'].items())
+                experience_skills_list_total.append(experience_skills_str.split(','))
             else:
                 experience_list.append("Name cannot be parsed " + " - " + str(y['Month']) + " month")
+                experience_skills_str = ", ".join((k + ' : ' + str(v)) for k, v in y['Skills'].items())
+                experience_skills_list_total.append(experience_skills_str.split(','))
 
         skills_cv_list = skills_cv.keys()
 
-        listing = ListingParser(config.UPLOAD_FILES_DIR + config.LISTING_SUBFOLDER + '/' + listing_name)
-        listing_data = listing.cluster_divider("./clusters/must_have.txt", "./clusters/good_to_have.txt", "./clusters/soft_skills.txt")
-        listing_details = listing.get_details()
-
+        listing_data = ListingParser(config.UPLOAD_FILES_DIR + config.LISTING_SUBFOLDER + '/' + listing_name)\
+            .cluster_divider("./clusters/must_have.txt", "./clusters/good_to_have.txt", "./clusters/soft_skills.txt")
 
         score = 0
         score_must = 0
         score_good = 0
         score_soft = 0
-
-        #Jobseeker Total exp month
-        total_exp_month = 0
-        for i in experience:
-            total_exp_month = total_exp_month + experience[i]['Month']
-
-        # JobList Total Min/Max Calculator
-        listing_years = listing_details['years_of_exp']
-
-        MODERATING_VALUE = 1
-        dynamic_weighting_denominator = abs(int(listing_years['min'])*12-int(total_exp_month))*MODERATING_VALUE
-
 
         listing_list_total_len = 0
         if type(listing_data['Cluster 1']) is dict:
@@ -282,8 +347,10 @@ def algorithm_result():
                                score_soft=score_soft,
                                excel_filename=workbook_filename,
                                experience_list=experience_list,
+                               experience_list_len=len(experience_list),
+                               experience_skills_list_total=experience_skills_list_total,
                                education=education,
-                               final_score=final_score
+                               final_score=final_score,
                                )
 
     elif request.method == 'GET':
