@@ -14,6 +14,7 @@ import pandas as pd
 import datetime
 from dateutil import relativedelta
 from nltk.corpus import stopwords
+import concurrent.futures
 import spacy
 import time
 
@@ -90,7 +91,34 @@ def extract_location():
     pass
 
 
+from concurrent.futures import ProcessPoolExecutor
+
+
+def extract_skills2(text_raw, noun_chunks, skills_file=None):
+    # A Draft for threads for EXT SKILLS
+    threads = []
+    #(len(noun_chunks))/2]
+    #with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
+    pool = ProcessPoolExecutor(2)
+
+    #arrays = [(text_raw[:int(len(text_raw) / 2)], noun_chunks[:int(len(noun_chunks) / 2)],None),
+              #(extract_skills2, text_raw[int(len(text_raw) / 2):],noun_chunks[int(len(noun_chunks) / 2):], None)]
+    #future = executor.submit(extract_skills2,text_raw, noun_chunks, None)
+    #future = executor.map(extract_skills2,arrays)
+    array1 = [text_raw[:int(len(text_raw) / 2)],noun_chunks[:int(len(noun_chunks) / 2)], None]
+    array2 = [text_raw[int(len(text_raw) / 2):],noun_chunks[int(len(noun_chunks) / 2):], None]
+    future = pool.submit(lambda d: extract_skills2(*d),array1)
+    future = pool.submit(lambda d: extract_skills2(*d), array1)
+    #future2 = executor.submit(extract_skills2, text_raw[int(len(text_raw) / 2):],
+                         #noun_chunks[int(len(noun_chunks) / 2):], None)
+    #     # t1.start()
+    # t2.start()
+    # print("T1",t1.join())
+
+    return future.result()
+    #return {**future.result(),**future2.result()}
 def extract_skills(text_raw, noun_chunks, skills_file=None):
+
     strt_time = datetime.datetime.now()
     # Inputs are:
     # text raw: full string version of CV file
@@ -103,7 +131,12 @@ def extract_skills(text_raw, noun_chunks, skills_file=None):
     :param noun_chunks: noun chunks extracted from nlp text
     :return: list of skills extracted
     '''
-    tokens = [token.text for token in text_raw if not token.is_stop]
+    #tokens = [token.text for token in text_raw if not token.is_stop]
+
+    if len(text_raw)>1:
+        tokens = text_raw.text.split()
+    else:
+        return {}
     if not skills_file:
         data = pd.read_csv(
             os.path.join(os.path.dirname(__file__), 'updated_u.csv')
