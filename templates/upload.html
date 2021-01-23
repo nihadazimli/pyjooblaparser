@@ -9,7 +9,7 @@
       <h2>Choose file to upload</h2>
       <form action = "./uploader" method = "POST"
          enctype = "multipart/form-data">
-          <input type = "file" name = "file" />
+          <input type = "file" name = "file" multiple="true" autocomplete="off" required/>
 
           <div>
               <input type="radio" id="CV" name="Upload" value="CV">

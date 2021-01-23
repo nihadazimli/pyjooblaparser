@@ -77,6 +77,5 @@ class ListingParser(object):
         self.__details['years_of_exp'] = utils.job_listing_years_ext(self.__text_raw)
         return self
 
-
     def get_details(self):
         return self.__details

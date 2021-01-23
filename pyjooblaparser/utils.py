@@ -31,8 +31,17 @@ SENIORITY = ['junior',
              'mid',
              'years of experience',
              'years of professional experience',
+             'years production expertise',
+             'years of production expertise',
              'years\' experience in'
             ]
+EXPERIENCE_KEYWORDS = [
+             'years of experience',
+             'years of professional experience',
+             'years production expertise',
+             'years of production expertise',
+             'years\' experience in'
+]
 RESUME_SECTIONS = [
                     'experience',
                     'education',
@@ -219,7 +228,12 @@ def cluster_finder(text_raw, this, soft=False):
     text = text_raw.strip(":")
     text = text.lower()
     text = text.split("\n")
-    file = open(this,"r")
+    try:
+        file = open(this,"r")
+    except:
+        os.system("ls")
+
+
     file = file.readline()
     phrases = file.split(",")
     label = []
@@ -539,8 +553,6 @@ def get_skill_months(experience_list, text_raw,nlp):
     return mounthly
 
 
-
-
 def job_listing_years_ext(text_raw):
     strt_time = datetime.datetime.now()
     text_raw_l = text_raw.lower()
@@ -552,7 +564,7 @@ def job_listing_years_ext(text_raw):
             found = re.search(word, i)
             if found:
                 found_str = i[found.start():found.end()]
-                if found_str == "years of experience" or found_str == "years of professional experience" or found_str == "years\' experience in" :
+                if found_str in EXPERIENCE_KEYWORDS:
                     before_keyword = i[:found.start()].split()
                     if len(before_keyword)>1:
                         if before_keyword[-2] == 'to' or before_keyword[-2] == 'than' or before_keyword[-2] == 'of':
@@ -563,12 +575,15 @@ def job_listing_years_ext(text_raw):
                     else:
                         return None
                     experience_definition = ' '.join(experience_definition)
-                    year = re.search(r"([0-9]+\-[0-9]+)|([a-z]+ [0-9(-^)]+\+|[a-z]+ [0-9]+[^-])|([0-9]+[^-]\+|[0-9]+)|([a-z]+\. [0-9])",experience_definition)
+                    print("EXPERIENCe DEFINISYON", experience_definition, "ismail gotdu")
+
+                    year = re.search(r"([0-9]+\-[0-9]+)|([a-z]+ [0-9(-^)]+\+|[a-z]+ [0-9(-^)]+|[a-z]+ [0-9]+[^-])|([0-9]+[^-]\+|[0-9]+)|([a-z]+\. [0-9])",experience_definition)
 
                     # year = experience_definition[year.start():year.end()]
                     exp = {}
                     if year:
                         if year.group(1):
+                            print("I am in group 2")
                             year = year.group(1).split('-')
                             exp = {"min":year[0],'max':year[1]}
                             return exp
@@ -593,9 +608,8 @@ def job_listing_years_ext(text_raw):
 
                                 # print(year.group(2),"group 2 ext")
 
-
                         if year.group(3):
-                            # print("I am in group 3")
+                            print("I am in group 3")
                             year = year.group(3)
                             if year[-1] == '+':
                                 year = year[:-1]
@@ -613,11 +627,11 @@ def job_listing_years_ext(text_raw):
                         #     else:
                         #         print("group 4 exit")
                 elif found_str == "junior":
-                    exp = 2
+                    exp = {'min': '2', 'max': '100'}
                 elif found_str == "mid":
-                    exp = 3
+                    exp = {'min': '3', 'max': '5'}
                 elif found_str == "senior":
-                    exp = 5
+                    exp = {'min': '5', 'max': '100'}
 
     # 10-15 years of experience
     # minimum 3 years of experience
