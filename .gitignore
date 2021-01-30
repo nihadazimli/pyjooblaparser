@@ -5,6 +5,8 @@ __pycache__/
 .DS_Store
 static/.DS_Store
 upload_files/.DS_Store
+upload_files/CV_files/.DS_Store
+upload_files/Listing_files/.DS_Store
 
 # C extensions
 *.so
