@@ -1,0 +1,43 @@
+Middle Tier & Database Administrator – Oracle SaaS-at-Customer Cloud Operations
+
+
+Description:
+
+The Oracle SaaS-at-Customer Operations team is looking for self-motivated individual contributors and dynamic team players to join our global team and work at the cutting edge of Oracle’s Cloud technologies.
+
+Please note before reading further:
+
+An essential function of this role will be supporting customers that are the US government. These customers require Oracle to staff their project with only US citizens (by birth or naturalization), require additional background checks, and require a government security clearance.
+
+
+The Oracle SaaS-at-Customer (S@C) service is an offering that gives Oracle customers the software and services provided by the Oracle Public Cloud on the hardware installed in the customer’s own data center. Members of the S@C Operations team are responsible for delivering strategic technical support and solutions to S@C customers while serving as an advocate for customer needs. Team members will engage in operational activities including monitoring, installation, patching, and upgrading Oracle Fusion middleware and Oracle database implementations. They are also expected to address extremely complex, critical customer system issues on a routine basis and document technical solutions.
+
+This position is for FULL-TIME work primarily day shift during weekdays and will require some weekend day/evening shifts for maintenance activities.
+
+Team members connect remotely to customer systems so travel to customer sites is not required. Candidates will be required to work from an Oracle office in either the Seattle / Bellevue, WA area Or Reston, VA.
+
+We are willing to consider both junior and senior-level technical analysts for this position.
+
+Minimum requirements include:
+
+Top Secret clearance or/ TS/SCI
+Relevant Industry experience of 5+ years
+Bachelor Degree in Computer Science, Engineering, or Information Systems
+Experience in at least one of the following:
+Weblogic Application Server Installation and Administration
+Oracle Fusion Middleware Installation and Administration
+Oracle RDBMS Installation and Administration (including RAC databases)
+Software Development / DevOPS / DevSecOPS
+Working knowledge of Linux including commands and shell scripting / Python
+Proficiency in at least one major programming language (e.g. Java, C, C++, etc.)
+Strong analytical/troubleshooting skills in middleware and/or database areas
+Excellent oral and written communication skills
+Highly motivated with the ability to work both independently and with members of a global team without close supervision
+An essential function of this role will be supporting customers that are the US government. These customers require Oracle to staff their project with only US citizens (by birth or naturalization), require additional background checks, and require a government security clearance.
+
+Preferred but not required:
+
+Oracle Fusion Application Installation and Administration experience (a big plus)
+SOA Suite administration (BPEL & WSM)
+Knowledge of Oracle Internet Directory (OID) & IDM administration
+Implementation and Administration of Oracle Goldengate

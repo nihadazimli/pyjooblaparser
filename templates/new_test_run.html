@@ -99,7 +99,12 @@ function MM_preloadImages() { //v3.0
         <tbody>
           <tr>
       <td height="72" colspan="4" style="font-size: 18px" align="center" valign="top"><p>&nbsp;</p>
-      <p>Match Score is: {{final_score}}%</p></td>
+      {% for score in final_score_list %}
+
+          <p>Score for {{score}}%</p>
+      {% endfor %}
+          </td>
+
           </tr>
           <tr>
 
