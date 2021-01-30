@@ -6,6 +6,7 @@ import xlsxwriter
 import csv
 from pyjooblaparser import ResumeParser
 from pyjooblaparser import ListingParser
+from nltk import SnowballStemmer
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = config.UPLOAD_FILES_DIR
@@ -173,6 +174,7 @@ def algorithm_result():
         experience = cv_data['experience']
         education = cv_data['education']
 
+
         experience_list = []
         experience_skills_list_total = []
         for x, y in experience.items():
@@ -190,14 +192,38 @@ def algorithm_result():
         listing = ListingParser(config.UPLOAD_FILES_DIR + config.LISTING_SUBFOLDER + '/' + listing_name)
 
         listing_data = listing.cluster_divider("./clusters/must_have.txt", "./clusters/good_to_have.txt", "./clusters/soft_skills.txt")
+        listing_d = listing.get_details()
+        listing_exp_len = listing_d['years_of_exp']
+        bonus  = 0
+        if cv_data['top100'] is not None:
+            bonus = bonus + 10
+        dep_CV = cv_data['education']['DEP']
+        dep_listing = listing_d['education']
+        if len(dep_CV) > 0 and len(dep_listing)> 0:
+            stemmer = SnowballStemmer("english")
+            dep_CV_arr = dep_CV.split()
+            if len(dep_CV_arr) == 2:
+                for k in dep_CV_arr:
+                    for i in dep_listing:
+                        z = i.split()
+                        z = z[0]
+                        dep1 = stemmer.stem(z)
+                        dep2 = stemmer.stem(k)
+                        if dep1 == dep2:
+                            bonus =  bonus + 10
+                        print("DEPARTAMENTS", dep1, dep2)
+            else:
+                for i in dep_listing:
+                    dep1 = stemmer.stem(i)
+                    dep2 = stemmer.stem(dep_CV)
+                    print("DEPARTAMENTS",dep1,dep2)
 
-        listing_exp_len = listing.get_details()['years_of_exp']
 
         total_exp_month = 0
         for i in experience:
             total_exp_month = total_exp_month + experience[i]['Month']
 
-        MODERATING_VALUE = 1
+        MODERATING_VALUE = 0.1
         print(listing_exp_len)
         dynamic_weighting_denominator = abs(int(listing_exp_len['min']) * 12 - int(total_exp_month)) * MODERATING_VALUE
 
@@ -227,8 +253,9 @@ def algorithm_result():
         try:
             intersection_list_must = list(set(skills_cv) & set(skills_listing_must.keys()))
             intersection_list_total_len += len(intersection_list_must)
-            score_must = len(intersection_list_must)*(config.WEIGHT_MUST) #/ dynamic_weighting_denominator
+            score_must = len(intersection_list_must)*(config.WEIGHT_MUST-dynamic_weighting_denominator)
             score += score_must
+            score = score
         except:
             intersection_list_must = {}
 
@@ -274,7 +301,7 @@ def algorithm_result():
         cv_skills_result = ", ".join((k + ' : ' + str(v)) for k, v in skills_cv.items())
         cv_skills_result = cv_skills_result.split(',')
 
-        total_score = len(listing_skills_must)*config.WEIGHT_MUST + len(listing_skills_good)*config.WEIGHT_GOOD + \
+        total_score = len(listing_skills_must)*config.WEIGHT_MUST  + len(listing_skills_good)*config.WEIGHT_GOOD + \
                       len(listing_skills_soft)*config.WEIGHT_SOFT
 
         final_score = str((score / total_score * 100))[:5]
