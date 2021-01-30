@@ -1,0 +1,50 @@
+It wasn’t so long ago that booking a trip so see the Eiffel Tower, stroll down New York’s iconic Madison Avenue or feel the sand between our toes on Copacabana Beach was simply a matter of a few taps on our smartphone. In fact, that’s what we do at Booking.com. We make it easier for everyone to experience the world. And while that world might feel a little farther away right now, we’re busy preparing for when the world is ready to travel once more. Across our offices worldwide, we continue to innovate. To solve for some of the most complex challenges in travel and technology, and to plan for the exciting developments that lie ahead. With strategic long-term investments into what we believe the future of travel can be, we are opening up new career opportunities that will have a strong impact on our mission. We are united in the belief that our very human desire to explore the planet’s beauty and discover more about other people and cultures will endure. The world is waiting for us. Together, we will be ready.
+
+The Technology department of Commercial Operations owns the customer journey end to end, from the customer facing self service app and web platforms to the support tooling used by our employees. ‘Behind the scenes’ we run the critical data and ML infrastructure that helps provide the right answer to our customers and partners as if by magic. We leverage machine learning and data to maximise efficiency and reduce friction. We take pride in our resilience and quality, knowing that our goal is to create a platform that serves all our customers the moment they need us the most.
+
+Our Data Platform enables all the products and teams in Commercial Operations technology department to model, monitor, stream and/or batch process their data for analytical consumption. At the same time the team supports the consumers of such data (Data Scientists, ML engineers and analytics teams) to discover and enhance the datasets.
+
+Booking.com is looking for a data-savvy professional to join our team. As a Data Engineer, you will be working with stakeholders throughout the company to ensure we have high-quality data to power our business in all departments. Decisions for every part of our business -- from the front end experience to performance marketing to partner products -- are driven by petabytes of our data via MySQL, Hadoop, Cassandra, etc. Your challenge will be to make sure we can utilize our petabyte-scale data even more effectively to support business decisions and improve our products. Joining a cross-functional team of developers, designers, data scientists, and product owners, we invite you to help us crunch the data to ensure our place as the planet’s #1 accommodation site.
+
+B.responsible
+
+As a Data Engineer, you are responsible for the development, performance, quality, and scaling of our data pipelines, with a special focus on . You will work independently and will also be responsible for making technical decisions within a team.
+
+Important Aspects Of The Job Include
+
+Rapidly developing next-generation scalable, flexible, and high-performance data pipelines.
+Solving issues with data and data pipelines, prioritizing based on customer impact.
+End-to-end ownership of in our core datasets and data pipelines.
+Experimenting with new tools and technologies to meet business requirements regarding performance, scaling, 
+Providing self-organizing tools that help the analytics community discover data, assess quality, explore usage, and find peers with relevant expertise.
+Acting as an intermediary for problems, with both technical and non-technical audiences.
+Contributing to the growth of Booking.com through interviewing, on-boarding, or other recruitment efforts.
+
+B.skilled
+
+We are looking for driven Data Engineers who enjoy solving problems, who initiate solutions and discussions, and who believe that any challenge can be scaled with the right mindset and tools.
+
+The ones that fit us best are the people who match the following requirements:
+
+Minimum of 9 years of experience in the field, using 2 or more server-side programming languages -- preferably Java, Python, Perl, etc.
+Experience with building scalable data pipelines in distributed environments with technologies such as Hadoop, Cassandra, Kafka, Spark, HBase, MySQL, etc.
+Knowledgeable about data modeling, data access, and data storage techniques.
+Understands and can develop streaming processing applications using technologies like Flink, Kafka-Streams, Spark-Streaming, etc.
+Hands-on experience of developing in and contributing to open-source data technologies, such as Hadoop.
+Demonstrable experience with SQL, HQL, CQL, etc.
+Experience of working on systems on large scale.
+Good understanding of basic analytics and machine learning concepts.
+Preferably a university degree in Computer Science.
+Excellent communication, written and spoken.
+
+B. Offered
+
+Living and working in Amsterdam, one of the most cosmopolitan cities in Europe
+Contributing to a high scale, complex, world renowned product and seeing real-time impact of your work on millions of travellers worldwide
+Working in a fast-paced and performance driven culture
+Opportunity to utilize technical expertise, leadership capabilities and entrepreneurial spirit
+Promote and drive impactful and innovative engineering solutions
+Technical, behavioural and interpersonal competence advancement via on-the-job opportunities, experimental projects, hackathons, conferences and active community participation
+Competitive compensation and benefits package and some great added perks of working in the home city of Booking.com
+
+Booking.com is proud to be an equal opportunity workplace and is an affirmative action employer. All qualified applicants will receive consideration for employment without regard to race, colour, religion, gender, gender identity or expression, sexual orientation, national origin, genetics, disability, age, or veteran status. We strive to move well beyond traditional equal opportunity and work to create an environment that allows everyone to thrive.

@@ -1,0 +1,32 @@
+Does the prospect of dealing with massive volumes of data excite you? Do you want to lead scalable data engineering solutions using AWS technologies? Do you want to create the next-generation tools for intuitive data access?
+Amazon's Finance Tech team needs a Data Engineer to shape the future of the Amazon finance data platform by working with stakeholders in North America, Asia and Europe. The team is committed to building the next generation big data platform that will be one of the world's largest finance data warehouses by volume to support Amazon's rapidly growing and dynamic businesses, and use it to deliver the BI applications which will have an immediate influence on day-to-day decision making. . Members of the team will be challenged to innovate using the latest big data techniques. We are looking for a passionate data engineer to develop a robust, scalable data model and optimize the consumption of data sources required to ensure accurate and timely reporting for the Amazon businesses. You will share in the ownership of the technical vision and direction for advanced reporting and insight products. You will work with top-notch technical professionals developing complex systems at scale and with a focus on sustained operational excellence. We are looking for people who are motivated by thinking big, moving fast, and exploring business insights. If you love to implement solutions to hard problems while working hard, having fun, and making history, this may be the opportunity for you.
+
+Responsibilities
+Design, implement, and support a platform providing secured access to large datasets.
+Interface with tax, finance and accounting customers, gathering requirements and delivering complete BI solutions.
+Collaborate with Finance Analysts to recognize and help adopt best practices in reporting and analysis: data integrity, test design, analysis, validation, and documentation.
+Model data and metadata to support ad-hoc and pre-built reporting.
+Own the design, development, and maintenance of ongoing metrics, reports, analyses, dashboards, etc. to drive key business decisions.
+Tune application and query performance using profiling tools and SQL.
+Analyze and solve problems at their root, stepping back to understand the broader context.
+Learn and understand a broad range of Amazon’s data resources and know when, how, and which to use and which not to use.
+Keep up to date with advances in big data technologies and run pilots to design the data architecture to scale with the increased data volume using AWS.
+Continually improve ongoing reporting and analysis processes, automating or simplifying self-service support for datasets.
+Triage many possible courses of action in a high-ambiguity environment, making use of both quantitative analysis and business judgment.
+
+Basic Qualifications
+Bachelor’s degree in Computer Science or related technical field
+4+ years combined experience in Data Warehousing and Big Data Systems
+Solid understanding and experience with at least one MPP Database (Redshift / Teradata / Netezza / Snowflake / etc.)
+Experience with Big Data Systems (Hadoop / Map Reduce / HDFS / Pig)
+Excellent knowledge of SQL (ANSI / Spark / Hive / etc.)
+Hands on experience with programming languages (Java / Python / etc.)
+Experience with one of the business intelligence reporting tools (OBIEE / Tableau / etc.)
+Preferred Qualifications
+Proven success in communicating with users, other technical teams, and senior management to collect requirements, describe data modeling decisions and data engineering strategy
+Experience providing technical leadership and mentoring other engineers for best practices on data engineering
+Knowledge of software engineering best practices across the development lifecycle, including agile methodologies, coding standards, code reviews, source management, build processes, testing, and operations
+Masters in computer science, mathematics, statistics, economics, or other quantitative field
+Exposure to very large databases, with a mix of software and data engineering.
+Understanding of Big Data technologies and solutions in AWS.
+Background in financial applications

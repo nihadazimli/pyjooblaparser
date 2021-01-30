@@ -17,7 +17,7 @@ from nltk.corpus import stopwords
 import concurrent.futures
 import spacy
 import time
-
+import config
 ##CONSTANTS###
 STOPWORDS = set(stopwords.words('english'))
 YEAR = r'(((20|19)(\d{2})))'
@@ -47,8 +47,137 @@ RESUME_SECTIONS = [
                     'experience',
                     'education',
                     'skills',
-                    'employment'
+                    'employment',
                 ]
+BACHELORS = ["genetic engineering and biotechnology",
+"architecture",
+"biochemistry",
+"biomedical science",
+"business administration",
+"clinical science",
+"commerce",
+"computer applications",
+"community health",
+"computer information systems",
+"construction technology",
+"criminal justice",
+"divinity",
+"economics",
+"fine arts",
+"letters",
+"information systems",
+"music",
+"pharmacy",
+"philosophy",
+"public affairs and policy management",
+"social work",
+"technology",
+"accountancy",
+"arts in american studies",
+"arts in american indian studies",
+"arts in applied psychology",
+"arts in biology",
+"arts in anthropology",
+"arts in child advocacy",
+"arts in clinical psychology",
+"arts in communication",
+"arts in forensic psychology",
+"arts in organizational psychology",
+"aerospace engineering",
+"accountancy",
+"actuarial",
+"agriculture",
+"applied economics",
+"architecture",
+"architectural engineering",
+"athletic training",
+"biology",
+"biomedical engineering",
+"bible",
+"business administration",
+"business administration - computer application",
+"business administration - economics",
+"business and technology",
+"chemical engineering",
+"chemistry",
+"civil engineering",
+"clinical laboratory science",
+"cognitive science",
+"computer engineering",
+"computer science",
+"construction engineering",
+"construction management",
+"criminal justice",
+"criminology",
+"diagnostic radiography",
+"education",
+"electrical engineering",
+"electronics and communications",
+"engineering physics",
+"engineering science",
+"engineering technology",
+"english literature",
+"environmental engineering",
+"environmental science",
+"environmental studies",
+"food science",
+"foreign service",
+"forensic science",
+"forestry",
+"history",
+"hospitality management",
+"human resources management",
+"industrial engineering",
+"information technology",
+"information systems",
+"integrated science",
+"international relations",
+"journalism",
+"legal management",
+"management",
+"manufacturing engineering",
+"marketing",
+"mathematics",
+"mathematical engineering",
+"mechanical engineering",
+"medical technology",
+"metallurgical engineering",
+"meteorology",
+"microbiology",
+"mining engineering",
+"molecular biology",
+"neuroscience",
+"nursing",
+"nutrition science",
+"software engineering",
+"petroleum engineering",
+"podiatry",
+"pharmacology",
+"pharmacy",
+"physical therapy",
+"physics",
+"plant science",
+"politics",
+"psychology",
+"public safety",
+"physiology",
+"quantity surveying engineering",
+"radiologic technology",
+"real-time interactive simulation",
+"religion",
+"respiratory therapy",
+"risk management and insurance",
+"science education",
+"sports management",
+"systems engineering",
+"music in jazz studies",
+"music in composition",
+"music in performance",
+"music in theory",
+"music in music education",
+"veterinary technology",
+"military and strategic studies"]
+
 ################################
 strt_time = 0
 end_time = 0
@@ -292,7 +421,10 @@ def cluster_finder(text_raw, this, soft=False):
 
 
 def extract_education(nlp_text):
+    print("educarion ",nlp_text)
     strt_time = datetime.datetime.now()
+    bachelor = ""
+    uni = ""
     '''
     Helper function to extract education from spacy nlp text
     :param nlp_text: object of `spacy.tokens.doc.Doc`
@@ -300,46 +432,78 @@ def extract_education(nlp_text):
     '''
     edu = {}
     # Extract education degree
-    for index, text in enumerate(nlp_text):
-        count = 0
-        splitted = text.split()
-        for tex in text.split():
+    print("HAAAA",nlp_text)
+    nlp_text_n  = []
+    found = False
+    for i in nlp_text:
+        tex = re.sub(r'&'," and ",i)
+        tex = re.sub(r'[\n|[?|$|.|!|,]', ' ',tex)
+        tex = re.sub(r'\s+',' ',tex)
+        s = tex.lower()
+        r = re.search("university",s)
+        t = re.search("college",s)
+        k= ''
+        word = "university"
+        if r or t:
+            if t:
+                word = "college"
+                k = t
+            else:
+                k = r
+            arr = s.split()
+            tex = tex.split()
+            print(tex)
+            index = arr.index(word)
+            if len(arr)> index+1:
+                if arr[index + 1] == 'of':
+                    if tex[index - 1][0].isupper():
+                        uni = arr[index-1] + " " + arr[index] + " " + "of" + " " + arr[index + 2]
+                    else:
+                        uni = arr[index] + " " + "of" + " " + arr[index+2]
+                else:
+                    uni = arr[index -1] + " " + arr[index]
+            # target = string[r.start()-10:r.start()]
+            # uni = target.split()
+            # uni = uni[len(uni)-1]
+        nlp_text_n.append(s)
 
-            tex = re.sub(r'[?|$|.|!|,]', r'', tex)
-            if tex.upper() in EDUCATION and tex not in STOPWORDS:
-                if tex.lower() == 'university':
-                    tex = splitted[count-1] + " " + tex
-                edu[tex] = text + nlp_text[index]
+    text = ' '.join(nlp_text_n)
+    print(text)
+    for i in BACHELORS:
+        s = re.findall(i,text)
+        print("SSS",s)
+        if len(s) > 0:
+            bachelor = s[0]
+            break
 
-            count = count + 1
+
+    # for index, text in enumerate(nlp_text):
+    #     count = 0
+    #     splitted = text.split()
+    #     for tex in text.split():
+    #
+    #         tex = re.sub(r'[?|$|.|!|,]', r'', tex)
+    #         if te.lower() in
+    #         if tex.upper() in EDUCATION:
+    #             if tex.lower() == 'university':
+    #                 if splitted[count + 1] == "of":
+    #                     tex = tex + " " + splitted[count + 1] + " " + splitted[count + 2]
+    #                 else:
+    #                     tex = splitted[count-1] + " " + tex
+    #             edu[tex] = text + nlp_text[index]
+    #
+    #
+    #         count = count + 1
     # Extract year
     education = []
-    for key in edu.keys():
-        #year = re.search(re.compile(YEAR), edu[key])
-        years = (re.findall(YEAR, edu[key]))
-        biggest = 0
-        for i in years:
-            new = int(i[0])
-            if new > biggest:
-                biggest = new
-        if biggest > 0:
-            education.append((key, biggest))
-        else:
-            education.append(key)
-    educ = {}
-    count = 0
-    for i in education:
-        count = count + 1
+    #year = re.search(re.compile(YEAR), edu[key])
+    years = re.findall(YEAR, text)
+    print("TEASR",years)
+    if len(years)> 0:
 
-        if len(i) > 1:
-            if str(i[1]).isnumeric():
-                educ[count] = {"Facility/Title": i[0], 'year': i[1]}
-
-            else:
-                educ[count] = {"Facility/Title": i, 'year': None}
-        else:
-            educ[count] = {"Facility/Title": i, 'year': None}
-
+        educ = {"UNI": uni, "DEP": bachelor, 'year': years[len(years)-1][0]}
+    else:
+        educ = {"UNI": uni, "DEP": bachelor, 'year': None}
 
         #print(year.string)
         # if year:
@@ -348,6 +512,7 @@ def extract_education(nlp_text):
         #     education.append(key)
     end_time = datetime.datetime.now() - strt_time
     print("EDUCATION",end_time)
+    print("EDUCATION",educ)
     return educ
 
 # def extract_education2(education_list):
@@ -408,11 +573,15 @@ def extract_entity_sections_grad(text):
     for phrase in text_split:
         if len(phrase) == 1:
             p_key = phrase
+            print("PKEY",p_key)
         else:
             p_key = set(phrase.lower().split()) & set(RESUME_SECTIONS)
+            print("PKEY2",p_key)
         try:
             p_key = list(p_key)[0]
+            print("PKEY4",p_key)
         except IndexError:
+            print("PKEY3",p_key)
             pass
         if p_key in RESUME_SECTIONS and entities.get(p_key, 0) == 0:
             entities[p_key] = []
@@ -445,7 +614,38 @@ def extract_entity_sections_grad(text):
     #         entities[entity] = None
     end_time = datetime.datetime.now() - strt_time
     print("Entity ext",end_time)
+    print("ENT",entities)
     return entities
+
+
+def entity_grad_2(text):
+    text = re.sub(":","",text)
+    text3 = text.lower().split()
+    text2 = text.lower().split(" ")
+
+    t = text.lower().split()
+    education = text3.index("education")
+    experiences = re.findall(r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present)', text, re.I)
+    print("eEE",experiences)
+    print("xddd",experiences[0][0])
+    experience = t.index(experiences[0][0].split(" ")[0].lower())
+    # if education > experience:
+    #     exp_end = education - 1
+    #     exp_end = education - 1
+    #     edu_end = len(t)-1
+    # else:
+    #     edu_end = experience - 1
+    #     exp_end = len(t)-1
+    edu = text3[education:]
+    edu = ' '.join(edu)
+    edu = edu.split('\n')
+    exp = text2[experience-3:]
+    exp = ' '.join(exp)
+    exp = exp.split("\n")
+    print("education",edu)
+
+    print("experience",exp)
+    return {"education": edu,"experience":exp}
 
 
 def get_total_experience(experience_list):

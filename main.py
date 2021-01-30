@@ -88,9 +88,9 @@ def new_test_run():
         file_listing.save(os.path.join(app.config['UPLOAD_FOLDER'] + config.LISTING_SUBFOLDER, filename_listing))
 
         listing_data = ListingParser(config.UPLOAD_FILES_DIR + config.LISTING_SUBFOLDER + '/' + filename_listing) \
-            .cluster_divider("/Users/nihadazimli/pyjooblaparser/must_have.txt",
-                             "/Users/nihadazimli/pyjooblaparser/good_to_have.txt",
-                             "/Users/nihadazimli/pyjooblaparser/soft_skills.txt")
+            .cluster_divider("./clusters/must_have.txt",
+                             "./clusters/good_to_have.txt",
+                             "./clusters/soft_skills.txt")
 
         full_cv_score_list = []
         for file_cv in files_cv:
@@ -227,7 +227,7 @@ def algorithm_result():
         try:
             intersection_list_must = list(set(skills_cv) & set(skills_listing_must.keys()))
             intersection_list_total_len += len(intersection_list_must)
-            score_must = len(intersection_list_must)*config.WEIGHT_MUST#/dynamic_weighting_denominator
+            score_must = len(intersection_list_must)*(config.WEIGHT_MUST) #/ dynamic_weighting_denominator
             score += score_must
         except:
             intersection_list_must = {}
