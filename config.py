@@ -1,4 +1,4 @@
-UPLOAD_FILES_DIR = '/Users/nihadazimli/pyjooblaparser/upload_files'
+UPLOAD_FILES_DIR = './upload_files'
 
 CV_SUBFOLDER = '/CV_files'
 LISTING_SUBFOLDER = '/Listing_files'

@@ -1,0 +1,62 @@
+DATA ENGINEER
+Skills
+HDFS, MapReduce, Hive, Impala, Pig Latin, Sqoop, Oozie, YARN, Avro, Parquet,Kafka
+Apache Spark : Spark Core, Dataframes, Spark SQL, Spark Streaming, Scala
+Programming Languages : C, C++, JAVA EE, SQL, PL/SQL
+Automation Tools : Python, Shell Scripting, BASH, Autosys,hbase
+ETL and Reporting tools : IBM Datastage, IBM Cognos , Crystal Reports, Cassandra, Flink
+Management Tools : Cloudera Manager, Hortonworks Ambari, Maven, SVN
+Professional Summary
+Professional Big Data Engineer with 6 years of industry experience including around 2.5 years of experience in Big Data technologies. Expertise in Hadoop/Spark development experience, automation tools and E2E life cycle of software design process. Outstanding communication skills, dedicated to maintain up-to-date IT skills and industry knowledge.
+
+Experience
+
+Data Engineer
+June 2015 - Present
+Bank of America – Charlotte, NC
+Migrated the existing data from Mainframes/Teradata/SQL Server to Hadoop and perform ETL operations on it.
+Designed and Implemented Sqoop incremental imports, delta imports on tables without primary keys and dates from Teradata and appends directly into Hive Warehouse.
+Converted Pig scripts/components of the ETL process (transformations) to Spark API.
+Worked with Avro and Parquet file formats and used various compression techniques to leverage the storage in HDFS.
+Used the Mainframe SerDe's and Avro SerDe's for serialization and de-serialization in hive to parse the contents.
+Written various shell scripts for DI and other error handling and mailing systems (DUSTc).
+Designed and developed ETL workflow using Oozie and automated them using Autosys.
+Worked on on-call production issues - scrubbing, resolve hive query issues, workaround for defects within SLA duration.
+
+Big Data Engineer
+January 2015 - June 2015
+Cloudwick Technologies
+Developed custom UDF's for pig scripts and hive queries to implement business logic/complex analysis on the data.
+Reduced the latency of spark jobs by tweaking the spark configurations and following other performance and Optimization techniques.
+Responsible for loading unstructured and semi-structured data into Hadoop by creating static and dynamic partitions.
+Used Sqoop to import/export data from various RDBMS (Teradata, Netezza, Oracle) to Hadoop cluster and vice versa.
+Configured the Oozie workflows to manage independent jobs and to automate Shell, Pig, kafka, Hive and Sqoop etc.
+jobs.
+
+Software Engineer
+September 2010 - July 2013
+Computer Science Corporation MEPZ GAP – TN
+Datastage 8.5, Serena, Unix, TOAD, Oracle 10G Sep'10 to Nov '12.
+Translating the business requirements into Datastage jobs.
+Tuned the long running jobs by improving the query performance and reduced the running time of the Datastage jobs.
+Worked with XML transformer and other complex transformations.
+Writing shell scripts to trigger the Data stage jobs.
+Scheduling the Datastage jobs using the ESP Scheduler.
+Pfizer - Cognos 10, TOAD, Unix Nov'12 to Jul '13.
+Develop and validate Reports and Dashborads.
+Scheduling Reports and grant permissions to the reports only to the appropriate users.
+Performed Report and Model Migration.
+
+Education
+2014
+Master of Science: Computer Science Engineering
+University of North Carolina - Charlotte
+
+2010
+Undergraduate: Electronics and Communications Engineering
+Jawaharlal Nehru Technological University -
+Electronics and Communication
+Certifications
+HortonWorks Certified Java Developer for Apache Hadoop
+CCDH-Cloudera Certified Developer for Apache Hadoop
+O'Rielly Developer Certification for Apache Spark
