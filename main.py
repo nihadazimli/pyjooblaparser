@@ -9,6 +9,7 @@ from pyjooblaparser import ListingParser
 from nltk import SnowballStemmer
 from pyjooblaparser import utils
 
+
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = config.UPLOAD_FILES_DIR
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -225,6 +226,11 @@ def algorithm_result():
                     print("DEPARTAMENTS",dep1,dep2)
 
 
+        print("listing_exp_len", listing_exp_len)
+
+        listing_exp_len_min = int(listing_exp_len['min'])*12
+
+
         total_exp_month = 0
         for i in experience:
             total_exp_month = total_exp_month + experience[i]['Month']
@@ -312,6 +318,7 @@ def algorithm_result():
         total_score = len(listing_skills_must)*config.WEIGHT_MUST  + len(listing_skills_good)*config.WEIGHT_GOOD + \
                       len(listing_skills_soft)*config.WEIGHT_SOFT
 
+
         #final_score = str((score / total_score * 100))[:5]
 
         final_score_wout_weight = score / total_score * 100
@@ -320,6 +327,7 @@ def algorithm_result():
         final_score_modified = utils.refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min,
                                                             final_score_modified)
         final_score = str(final_score_modified)[:5]
+
         score_must = str((score_must / (len(listing_skills_must) * config.WEIGHT_MUST))*100)[:5]
         score_good = str((score_good / (len(listing_skills_good) * config.WEIGHT_GOOD))*100)[:5]
         score_soft = str((score_soft / (len(listing_skills_soft) * config.WEIGHT_SOFT))*100)[:5]
@@ -387,7 +395,6 @@ def algorithm_result():
         worksheet.write('K2', score_soft)
 
         workbook.close()
-        print(listing_exp_len)
         return render_template('test.html',
                                listing_month_of_exp=str(int(listing_exp_len['min'])*12),
                                resume_month_of_exp=total_exp_month,
