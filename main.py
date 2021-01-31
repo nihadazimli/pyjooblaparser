@@ -7,6 +7,7 @@ import csv
 from pyjooblaparser import ResumeParser
 from pyjooblaparser import ListingParser
 from nltk import SnowballStemmer
+from pyjooblaparser import utils
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = config.UPLOAD_FILES_DIR
@@ -194,6 +195,11 @@ def algorithm_result():
         listing_data = listing.cluster_divider("./clusters/must_have.txt", "./clusters/good_to_have.txt", "./clusters/soft_skills.txt")
         listing_d = listing.get_details()
         listing_exp_len = listing_d['years_of_exp']
+
+        print("listing_exp_len", listing_exp_len)
+
+        listing_exp_len_min = int(listing_exp_len['min'])*12
+
         bonus  = 0
         if cv_data['top100'] is not None:
             bonus = bonus + 10
@@ -223,9 +229,9 @@ def algorithm_result():
         for i in experience:
             total_exp_month = total_exp_month + experience[i]['Month']
 
-        MODERATING_VALUE = 0.1
-        print(listing_exp_len)
-        dynamic_weighting_denominator = abs(int(listing_exp_len['min']) * 12 - int(total_exp_month)) * MODERATING_VALUE
+        # MODERATING_VALUE = 1
+        # print(listing_exp_len)
+        # dynamic_weighting_denominator = abs(int(listing_exp_len['min']) * 12 - int(total_exp_month)) * MODERATING_VALUE
 
         score = 0
         score_must = 0
@@ -253,7 +259,7 @@ def algorithm_result():
         try:
             intersection_list_must = list(set(skills_cv) & set(skills_listing_must.keys()))
             intersection_list_total_len += len(intersection_list_must)
-            score_must = len(intersection_list_must)*(config.WEIGHT_MUST-dynamic_weighting_denominator)
+            score_must = len(intersection_list_must)*(config.WEIGHT_MUST)#-dynamic_weighting_denominator)
             score += score_must
             score = score
         except:
@@ -275,6 +281,8 @@ def algorithm_result():
             score += score_soft
         except:
             intersection_list_soft = []
+
+        experience_duration_totals_dict = utils.experience_total_duration(experience, intersection_list_must)
 
         matching_skills_must = intersection_list_must
         matching_skills_good = intersection_list_good
@@ -304,7 +312,14 @@ def algorithm_result():
         total_score = len(listing_skills_must)*config.WEIGHT_MUST  + len(listing_skills_good)*config.WEIGHT_GOOD + \
                       len(listing_skills_soft)*config.WEIGHT_SOFT
 
-        final_score = str((score / total_score * 100))[:5]
+        #final_score = str((score / total_score * 100))[:5]
+
+        final_score_wout_weight = score / total_score * 100
+        final_score_modified = utils.refine_score_by_experience(listing_exp_len_min, total_exp_month,
+                                                                final_score_wout_weight)
+        final_score_modified = utils.refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min,
+                                                            final_score_modified)
+        final_score = str(final_score_modified)[:5]
         score_must = str((score_must / (len(listing_skills_must) * config.WEIGHT_MUST))*100)[:5]
         score_good = str((score_good / (len(listing_skills_good) * config.WEIGHT_GOOD))*100)[:5]
         score_soft = str((score_soft / (len(listing_skills_soft) * config.WEIGHT_SOFT))*100)[:5]

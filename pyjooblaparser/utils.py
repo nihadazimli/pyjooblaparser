@@ -265,6 +265,52 @@ TOP100 = ["university of california, los angeles (ucla)",
 ################################
 strt_time = 0
 end_time = 0
+
+
+def refine_score_by_experience(listing_exp_len, total_exp_month, score):
+    print("listing_exp_len", listing_exp_len)
+    print("total_exp_month", total_exp_month)
+    print("score", score)
+
+    if 0 < listing_exp_len < 24:
+        if total_exp_month > 36:
+            print("1")
+            score = score - (total_exp_month - 36) * 1.5
+    elif 24 < listing_exp_len < 60:
+        print("2")
+        if 0 < total_exp_month < 24:
+            score = score - (24 - total_exp_month) * 1.5
+        elif total_exp_month > 72:
+            score = score - (total_exp_month - 12) * 1.2
+    elif 60 < listing_exp_len < 120:
+        print("3")
+        if 0 < total_exp_month < 60:
+            score = score - (60 - total_exp_month) * 1
+        if total_exp_month > 120:
+            score = score - (total_exp_month - 60) * 0.6
+    elif listing_exp_len > 120:
+        print("4")
+        if 0 < total_exp_month < 120:
+            score = score - (120 - total_exp_month) * 0.5
+
+    return score
+
+
+def experience_total_duration(experience, intersection_must_list):
+    experience_duration = {}
+    for _, y in experience.items():
+        for skill, _ in y['Skills'].items():
+            if skill in intersection_must_list:
+                try:
+                    experience_duration[skill] += y['Month']
+                except KeyError:
+                    experience_duration[skill] = y['Month']
+                except Exception as e:
+                    print("Unexcepted error", e)
+    print(experience_duration)
+    return experience_duration
+
+
 def extract_text(resume_full_path, ext):
     strt_time = datetime.datetime.now()
     # INPUTS
@@ -960,3 +1006,16 @@ def job_listing_years_ext(text_raw):
     print("JOB LISTING YEARS EXT",end_time)
     return exp
 
+def refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min, score):
+    print(experience_duration_totals_dict, listing_exp_len_min, score)
+    for skill, duration in experience_duration_totals_dict.items():
+        if abs(duration-listing_exp_len_min) < 13:
+            if 0 < score < 40:
+                score = score + 12
+            elif 40 < score < 60:
+                score = score + 10
+            elif 60 < score < 80:
+                score = score + 5
+            elif 80 < score < 90:
+                score = score + 3
+    return score
