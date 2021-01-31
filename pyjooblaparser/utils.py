@@ -17,7 +17,7 @@ from nltk.corpus import stopwords
 import concurrent.futures
 import spacy
 import time
-import config
+import snowballstemmer
 ##CONSTANTS###
 STOPWORDS = set(stopwords.words('english'))
 YEAR = r'(((20|19)(\d{2})))'
@@ -66,7 +66,6 @@ BACHELORS = ["genetic engineering and biotechnology",
 "fine arts",
 "letters",
 "information systems",
-"music",
 "pharmacy",
 "philosophy",
 "public affairs and policy management",
@@ -110,9 +109,9 @@ BACHELORS = ["genetic engineering and biotechnology",
 "criminal justice",
 "criminology",
 "diagnostic radiography",
-"education",
 "electrical engineering",
 "electronics and communications",
+"electronics",
 "engineering physics",
 "engineering science",
 "engineering technology",
@@ -164,7 +163,6 @@ BACHELORS = ["genetic engineering and biotechnology",
 "quantity surveying engineering",
 "radiologic technology",
 "real-time interactive simulation",
-"religion",
 "respiratory therapy",
 "risk management and insurance",
 "science education",
@@ -177,6 +175,93 @@ BACHELORS = ["genetic engineering and biotechnology",
 "music in music education",
 "veterinary technology",
 "military and strategic studies"]
+
+
+TOP100 = ["university of california, los angeles (ucla)",
+"nanyang technological university, singapore (ntu)",
+"ucl",
+"university of washington",
+"columbia university",
+"cornell university",
+"new york university (nyu)",
+"peking university",
+"the university of edinburgh",
+"university of waterloo",
+"university of british columbia",
+"the hong kong university of science and technology",
+"georgia institute of technology",
+"the university of tokyo",
+"california institute of technology (caltech)",
+"the chinese university of hong kong (cuhk)",
+"university of texas at austin",
+"the university of melbourne",
+"university of illinois at urbana-champaign",
+"shanghai jiao tong university",
+"university of pennsylvania",
+"kaist - korea advanced institute of science & technology",
+"technical university of munich",
+"the university of hong kong",
+"université psl",
+"politecnico di milano",
+"the australian national university",
+"the university of sydney",
+"kth royal institute of technology",
+"university of southern california",
+"university of amsterdam",
+"yale university",
+"university of chicago",
+"seoul national university",
+"university of michigan-ann arbor",
+"university of maryland, college park",
+"aarhus university",
+"boston university",
+"city university of hong kong",
+"delft university of technology",
+"duke university",
+"ecole polytechnique",
+"eindhoven university of technology",
+"fudan university",
+"indian institute of technology bombay (iitb)",
+"indian institute of technology delhi (iitd)",
+"johns hopkins university",
+"ku leuven",
+"king abdulaziz university (kau)",
+"king's college london",
+"kit, karlsruhe institute of technology",
+"korea university",
+"kyoto university",
+"lomonosov moscow state university",
+"ludwig-maximilians-universität münchen",
+"mcgill university",
+"monash university",
+"national taiwan university (ntu)",
+"politecnico di torino",
+"purdue university",
+"rwth aachen university",
+"sapienza university of rome",
+"sorbonne university",
+"sungkyunkwan university(skku)",
+"technische universität berlin (tu berlin)",
+"vienna university of technology",
+"the hong kong polytechnic university",
+"the university of auckland",
+"the university of manchester",
+"the university of new south wales (unsw sydney)",
+"the university of queensland",
+"tokyo institute of technology (tokyo tech)",
+"trinity college dublin, the university of dublin",
+"universidad de chile",
+"universidade de são paulo",
+"alma mater studiorum - university of bologna",
+"universitat politècnica de catalunya · barcelonatech (upc)",
+"université catholique de louvain (uclouvain)",
+"université de montréal",
+"universiti malaya (um)",
+"university of alberta",
+"university of california, san diego (ucsd)",
+"university of science and technology of china",
+"university of technology sydney",
+"university of wisconsin-madison"]
 
 ################################
 strt_time = 0
@@ -247,7 +332,12 @@ def extract_name():
     # To be populated
     pass
 
-
+def top100(text):
+    text = text.lower()
+    for i in TOP100:
+        search = re.findall(i,text)
+        if len(search) > 0:
+            return search[0]
 def extract_email(text_raw):
 
     # Input email regex
@@ -274,6 +364,22 @@ def extract_location():
     # To be populated
     pass
 
+def extract_department_listing(text):
+    found = ""
+    found_arr = []
+    for i in BACHELORS:
+        found = re.findall(i, text.lower())
+        if found:
+            found_arr.append(found[0].lower())
+
+    return found_arr
+
+def matcher(found_arr,dep):
+    for i in found_arr:
+        s = re.findall(dep,i)
+        if len(s)>0:
+            return s
+    return None
 
 from concurrent.futures import ProcessPoolExecutor
 
@@ -467,6 +573,8 @@ def cluster_finder(text_raw, this, soft=False):
 
 
 def extract_education(nlp_text):
+    #nlp_text = " ".join(nlp_text)
+    #nlp_text = nlp_text.split("\n")
     print("educarion ",nlp_text)
     strt_time = datetime.datetime.now()
     bachelor = ""
@@ -488,21 +596,20 @@ def extract_education(nlp_text):
         s = tex.lower()
         r = re.search("university",s)
         t = re.search("college",s)
-        k= ''
         word = "university"
         if r or t:
             if t:
                 word = "college"
-                k = t
-            else:
-                k = r
             arr = s.split()
             tex = tex.split()
             print(tex)
             index = arr.index(word)
-            if len(arr)> index+1:
+            if len(arr) > index + 1:
                 if arr[index + 1] == 'of':
+                    print("ASASSAS", tex[index - 1])
                     if tex[index - 1][0].isupper():
+                        print("ASASSAS",tex[index - 1])
+                        print(arr)
                         uni = arr[index-1] + " " + arr[index] + " " + "of" + " " + arr[index + 2]
                     else:
                         uni = arr[index] + " " + "of" + " " + arr[index+2]
@@ -666,26 +773,30 @@ def extract_entity_sections_grad(text):
 
 def entity_grad_2(text):
     text = re.sub(":","",text)
-    text3 = text.lower().split()
+    # text3_U= text.split()
+    # text3 = text.lower().split()
+    text2_U = text.split(" ")
     text2 = text.lower().split(" ")
-
     t = text.lower().split()
-    education = text3.index("education")
+    try:
+        education = text2.index("university")
+    except:
+        education = text2.index("college")
     experiences = re.findall(r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present)', text, re.I)
     print("eEE",experiences)
     print("xddd",experiences[0][0])
     experience = t.index(experiences[0][0].split(" ")[0].lower())
-    # if education > experience:
-    #     exp_end = education - 1
-    #     exp_end = education - 1
-    #     edu_end = len(t)-1
-    # else:
-    #     edu_end = experience - 1
-    #     exp_end = len(t)-1
-    edu = text3[education:]
+    if education > experience:
+        exp_end = education - 1
+        exp_end = education - 1
+        edu_end = len(t)-1
+    else:
+        edu_end = experience - 1
+        exp_end = len(t)-1
+    edu = text2_U[education-10:edu_end]
     edu = ' '.join(edu)
     edu = edu.split('\n')
-    exp = text2[experience-3:]
+    exp = text2_U[experience-15:exp_end]
     exp = ' '.join(exp)
     exp = exp.split("\n")
     print("education",edu)
