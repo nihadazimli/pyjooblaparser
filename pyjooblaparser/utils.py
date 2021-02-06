@@ -773,9 +773,9 @@ def entity_grad_2(text):
         print("NIHAD GOR",experiences)
     except IndexError:
         print("OHAA")
-        #experience = t.index(experiences[0].split(" ")[0].lower())
+        experience = t.index(experiences[0].split(" ")[0].lower())
     if education > experience:
-        exp_end = len(t)-1
+        exp_end = education - 1
         edu_end = len(t)-1
     else:
         edu_end = experience - 1
