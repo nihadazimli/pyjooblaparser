@@ -1,0 +1,39 @@
+We’re a technology company. Technology enables us to do a business no one else in the world is doing. It is out biggest advantage.
+
+Getir is growing incredibly fast in Turkey, but we want to grow globally. London to Tokyo. Sao Paulo to New York. Our global ambitions can only be accomplished with exceptional technology.
+
+Great technology is developed by great humans and we are always hiring great developers so that we can continue developing new technologies.
+
+Here’s what you fundamentally need to be a kickass Senior Android Developer at Getir:
+
+Who You are:
+
+Android developer with 5+ years hands-on  experience in an agile team,
+Have published and supported one or more Android apps in the Google Play Store,
+Proficient with Java & Kotlin programming languages,
+Fundamental knowledge of memory, processes, threads, and their relation to programming,
+Experience in implementing payment systems,
+Ability to develop functional mobile applications by modern architectures like VIPER and MVVM
+Strong knowledge of unit and test automation for Android OS platforms,
+Experience with Socket.io and familiar with socket technologies
+Working with Git version control system, including branching and merging strategies
+Experience with 3rd party libraries like Dagger, Retrofit
+Extensive experience with Android SDK and AndroidX Architecture Components like Data Binding, Life Cycles, Live Data, Room
+Would be Advantageous:
+Experience in using GMS (Location, Maps, Places, FCM) tools and APIs.
+Experience with HMS (Huawei Mobile Services) and/or Yandex MapKit is nice to have.
+Experience in using CI&CD tools like Jenkins, Fastlane, Firebase App Distribution
+B.Sc. in Computer Science or a similar discipline
+Responsibilities:
+
+Develop mobile applications and improve the quality of our system
+Analyze and resolve technical and application problems
+Bring new technology and ideas to the table
+Influence cross team initiatives and mentor engineers
+Desired Characteristics:
+
+Passionate about technology
+Eager to learn and stretch your boundaries
+Works well in a team and takes initiative
+Open to new approaches and new ideas
+Must be a DOer, a curious learner

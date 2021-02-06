@@ -1,0 +1,45 @@
+Hi There!
+
+Awesome health-tech startup looking for a machine learning and computer vision expert to deliver the next version of our wellness app, Vivoo. www.vivoo.io
+
+
+Our company is fully funded and we are looking for an individual who can take us to the next level. If you are a highly dedicated person, innovative with a flair for great coding then this job is is for you. Apply today!
+
+
+Our 5 years old company is located in Etiler.
+
+
+Bachelor’s Degree in Computer Science, Computer Engineering or equivalent work experience
+
+
+Android Developer with at least 2 years of experience 
+
+
+
+Fluency in written and spoken English
+
+Experience working with RestFul apis
+
+Experience with Android native development with Kotlin
+
+A rock-solid understanding of object-oriented design patterns and SOLID principles
+
+Experience working on different architecture patterns like MVP, MVVM and MVI
+
+Proficiency with GIT
+
+Experience with dependency injection libraries (Koin is a plus)
+
+Preferably open to iOS application development and learning
+
+Camera2, CameraX, TensorflowLite experiences are plusses.
+
+Having military service completed or at least 2 years postponed (only for male candidates)
+
+
+We are an equal opportunity employer and value diversity. 
+
+We consider all applications equally regardless of race, color, ancestry, religion, sex, national origin, sexual orientation, age, citizenship, marital status, disability, or gender identity. 
+
+
+If our vision appeals to you please don’t hesitate to apply, we are looking forward to getting to know you.

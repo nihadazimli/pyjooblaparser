@@ -50,7 +50,6 @@ RESUME_SECTIONS = [
                     'employment',
                 ]
 BACHELORS = ["genetic engineering and biotechnology",
-"architecture",
 "biochemistry",
 "biomedical science",
 "business administration",
@@ -87,7 +86,6 @@ BACHELORS = ["genetic engineering and biotechnology",
 "actuarial",
 "agriculture",
 "applied economics",
-"architecture",
 "architectural engineering",
 "athletic training",
 "biology",
@@ -133,7 +131,6 @@ BACHELORS = ["genetic engineering and biotechnology",
 "international relations",
 "journalism",
 "legal management",
-"management",
 "manufacturing engineering",
 "marketing",
 "mathematics",
@@ -707,7 +704,7 @@ def extract_entity_sections_grad(text):
     count = 0
     for i in text_split2:
         count = count + 1
-        experience = re.search(r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present)', i, re.I)
+        experience = re.search(r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present|recent)', i, re.I)
         if experience:
             try:
                 if text_split2[count - 1] != '' and text_split2[count - 3] != '' \
@@ -772,37 +769,64 @@ def extract_entity_sections_grad(text):
 
 
 def entity_grad_2(text):
-    text = re.sub(":","",text)
-    # text3_U= text.split()
-    # text3 = text.lower().split()
+    text = re.sub(":|,|\."," ",text)
+    text = re.sub("\n"," ",text)
+    text = re.sub("\t"," ",text)
+    text = re.sub("\s+"," ",text)
     text2_U = text.split(" ")
     text2 = text.lower().split(" ")
+
+    print("TEXT2",text2)
     t = text.lower().split()
     try:
         education = text2.index("university")
     except:
         education = text2.index("college")
-    experiences = re.findall(r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present)', text, re.I)
+    experiences = re.findall(r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present|recent)', text, re.I)
+
+
+
+    print(experiences)
     print("eEE",experiences)
-    print("xddd",experiences[0][0])
-    experience = t.index(experiences[0][0].split(" ")[0].lower())
+
+
+    try:
+        if get_number_of_months_from_dates(experiences[0][0], experiences[0][2]) is not 0:
+
+
+            experience = t.index(experiences[0][0].split(" ")[-1].lower())
+            print("ALAA",experience)
+        else:
+            experiences = experiences[1:]
+            experience = t.index(experiences[0][-1].split(" ")[-1].lower())
+            print("ALAA", experiences[0][-1].split(" ")[-1].lower())
+        print("NIHAD GOR",experiences)
+    except IndexError:
+        print("OHAA")
+        experience = t.index(experiences[0].split(" ")[0].lower())
     if education > experience:
-        exp_end = education - 1
-        exp_end = education - 1
+        exp_end = len(t)-1
         edu_end = len(t)-1
     else:
         edu_end = experience - 1
         exp_end = len(t)-1
-    edu = text2_U[education-10:edu_end]
+    print(education,edu_end)
+    print(experience,exp_end)
+    edu = text2_U[education-30:edu_end]
     edu = ' '.join(edu)
     edu = edu.split('\n')
     exp = text2_U[experience-15:exp_end]
     exp = ' '.join(exp)
+    for i in experiences:
+        print("NONO",i)
+        s =' '.join(i)
+        exp = re.sub(s,str(s+" \n"), exp)
     exp = exp.split("\n")
     print("education",edu)
 
     print("experience",exp)
-    return {"education": edu,"experience":exp}
+    return {"education": edu,
+            "experience": exp}
 
 
 def get_total_experience(experience_list):
@@ -815,7 +839,7 @@ def get_total_experience(experience_list):
     exp_ = []
     for line in experience_list:
         experience = re.search(
-            r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present)',
+            r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present|recent)',
             line,
             re.I
         )
@@ -838,7 +862,7 @@ def get_number_of_months_from_dates(date1, date2):
     :param date2: Ending date
     :return: months of experience from date1 to date2
     '''
-    if date2.lower() == 'present':
+    if date2.lower() == 'present' or date2.lower() == 'recent':
         date2 = datetime.datetime.now().strftime('%b %Y')
     try:
         if len(date1.split()[0]) > 3:
@@ -870,13 +894,33 @@ def extract_experience(experience_list):
     for line in experience_list:
 
         experience = re.search(
-            r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s(?P<smonth>\w+.\d\d\d\d|present|Present)',
+            r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s(?P<smonth>\w+.\d\d\d\d|present|Present|Recent|recent)',
             line,
             re.I
         )
         if experience:
             date_name = line[experience.start():experience.end()]
             exp_name = (line[:experience.start()])
+            words = exp_name.split()
+            #all_upper = re.findall("[A-Z]+[A-Z]+",exp_name)
+            cons_uppper = re.findall('([A-Z][a-z]+(?=\s[A-Z])(?:\s[A-Z][a-z]+)+)|([A-Z][A-Z]+(?=\s[A-Z])(?:\s[A-Z][A-Z]+)+)', exp_name)
+            if len(cons_uppper) > 1:
+                if len(cons_uppper[1]) > 0:
+                    print("CONS",cons_uppper)
+                    try:
+                        cons_uppper = cons_uppper[1][:4]
+                    except:
+                        cons_uppper = cons_uppper
+                    exp_name = " ".join(cons_uppper)
+            elif len(cons_uppper[0]) > 0:
+                try:
+                    cons_uppper = cons_uppper[0][:4]
+                except:
+                    cons_uppper = cons_uppper
+                exp_name = " ".join(cons_uppper)
+            elif len(words) > 2:
+                exp_name = " ".join(words[:2])
+
 
             if exp_name == "":
                 if count is not 1:
@@ -919,7 +963,14 @@ def get_skill_months(experience_list, text_raw,nlp):
             start = re.search(experience_list[i]['Date_name'], text_raw)
             end = re.search(experience_list[i+1]['Date_name'], text_raw[start.start():])
             try:
-                skills_t = nlp(text_raw[start.start():end.start()])
+                if end.start() < start.start():
+                    skills_t = nlp(text_raw[end.start():start.start()])
+                elif end.start() > start.start():
+                    skills_t = nlp(text_raw[start.start():end.start()])
+                print("SKILLS T",skills_t)
+                print("START",start.start())
+                print("END",end.start())
+                print("TEXT",text_raw)
             except AttributeError:
                 #print("STRING EXP",experience_list[i]['Experience Name'])
                 count = count + 1
@@ -1053,3 +1104,4 @@ def refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min,
             elif 80 < score < 90:
                 score = score + 3
     return score
+

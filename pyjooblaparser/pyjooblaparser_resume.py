@@ -58,8 +58,8 @@ class ResumeParser(object):
         # personal_information_seperator_regex = config.PERSONAL_INFORMATION_SEPERATOR
         # personal_information_raw_text = re.split(personal_information_seperator_regex, self.__text_raw.lower())
         #this = self.__nlp
-        entities = utils.extract_entity_sections_grad(self.__text_raw)
-        #entities = utils.entity_grad_2(self.__text_raw)
+        #entities = utils.extract_entity_sections_grad(self.__text_raw)
+        entities = utils.entity_grad_2(self.__text_raw)
         self.__details['email'] = utils.extract_email(self.__text_raw)
         self.__details['mobile_number'] = utils.extract_number(self.__text_raw)
         self.__details['skills'] = utils.extract_skills(self.__nlp,self.__noun_chunks,None)
