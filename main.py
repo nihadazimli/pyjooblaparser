@@ -173,6 +173,7 @@ def algorithm_result():
         cv_data = ResumeParser(config.UPLOAD_FILES_DIR + config.CV_SUBFOLDER + '/' + cv_name).get_details()
         skills_cv = cv_data['skills']
         experience = cv_data['experience']
+        print(experience)
         education = cv_data['education']
 
 
@@ -314,11 +315,11 @@ def algorithm_result():
 
         #final_score = str((score / total_score * 100))[:5]
 
-        final_score_wout_weight = score / total_score * 100
-        final_score_modified = utils.refine_score_by_experience(listing_exp_len_min, total_exp_month,
-                                                                final_score_wout_weight)
-        final_score_modified = utils.refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min,
-                                                            final_score_modified)
+        final_score_modified = score / total_score * 100
+        #final_score_modified = utils.refine_score_by_experience(listing_exp_len_min, total_exp_month,
+                                                                #final_score_wout_weight)
+        #final_score_modified = utils.refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min,
+                                                          #  final_score_modified)
         final_score = str(final_score_modified)[:5]
         score_must = str((score_must / (len(listing_skills_must) * config.WEIGHT_MUST))*100)[:5]
         score_good = str((score_good / (len(listing_skills_good) * config.WEIGHT_GOOD))*100)[:5]

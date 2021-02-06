@@ -739,20 +739,29 @@ def extract_entity_sections_grad(text):
 
 
 def entity_grad_2(text):
-    text = re.sub(":","",text)
-    # text3_U= text.split()
-    # text3 = text.lower().split()
+    text = re.sub(":|,|\."," ",text)
+    text = re.sub("\n"," ",text)
+    text = re.sub("\t"," ",text)
+    text = re.sub("  "," ",text)
     text2_U = text.split(" ")
     text2 = text.lower().split(" ")
+
+    print("TEXT2",text2)
     t = text.lower().split()
     try:
         education = text2.index("university")
     except:
         education = text2.index("college")
     experiences = re.findall(r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present)', text, re.I)
+    print(experiences)
     print("eEE",experiences)
-    print("xddd",experiences[0][0])
-    experience = t.index(experiences[0][0].split(" ")[0].lower())
+
+
+    try:
+
+        experience = t.index(experiences[0][0].split(" ")[0].lower())
+    except IndexError:
+        experience = t.index(experiences[0].split(" ")[0].lower())
     if education > experience:
         exp_end = education - 1
         exp_end = education - 1
@@ -765,11 +774,14 @@ def entity_grad_2(text):
     edu = edu.split('\n')
     exp = text2_U[experience-15:exp_end]
     exp = ' '.join(exp)
+    for i in experiences:
+        exp = re.sub(i[-1],str(i[-1]+" \n"), exp)
     exp = exp.split("\n")
     print("education",edu)
 
     print("experience",exp)
-    return {"education": edu,"experience":exp}
+    return {"education": edu,
+            "experience": exp}
 
 
 def get_total_experience(experience_list):
@@ -1006,16 +1018,16 @@ def job_listing_years_ext(text_raw):
     print("JOB LISTING YEARS EXT",end_time)
     return exp
 
-def refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min, score):
-    print(experience_duration_totals_dict, listing_exp_len_min, score)
-    for skill, duration in experience_duration_totals_dict.items():
-        if abs(duration-listing_exp_len_min) < 13:
-            if 0 < score < 40:
-                score = score + 12
-            elif 40 < score < 60:
-                score = score + 10
-            elif 60 < score < 80:
-                score = score + 5
-            elif 80 < score < 90:
-                score = score + 3
-    return score
+# def refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min, score):
+#     print(experience_duration_totals_dict, listing_exp_len_min, score)
+#     for skill, duration in experience_duration_totals_dict.items():
+#         if abs(duration-listing_exp_len_min) < 13:
+#             if 0 < score < 40:
+#                 score = score + 12
+#             elif 40 < score < 60:
+#                 score = score + 10
+#             elif 60 < score < 80:
+#                 score = score + 5
+#             elif 80 < score < 90:
+#                 score = score + 3
+#     return score
