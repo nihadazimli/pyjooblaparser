@@ -14,6 +14,7 @@ import pandas as pd
 import datetime
 from dateutil import relativedelta
 from nltk.corpus import stopwords
+import concurrent.futures
 import spacy
 import time
 import snowballstemmer
@@ -264,6 +265,22 @@ strt_time = 0
 end_time = 0
 
 
+def extract_text(resume_full_path, ext):
+    strt_time = datetime.datetime.now()
+    # INPUTS
+    # resume_full_path: full file path of CV
+    # ext: extension of CV file (e.g. .pdf)
+    if ext == '.pdf':
+        text_raw = extract_text_from_pdf(resume_full_path)
+    # elif ext == '.docx':
+    #     text_raw = extract_text_from_docx(resume_full_path)
+    else:
+        text_raw = extract_text_from_any(resume_full_path)
+    end_time = datetime.datetime.now() - strt_time
+    print("EXTR TXT",end_time)
+    return text_raw
+
+
 def refine_score_by_experience(listing_exp_len, total_exp_month, score):
     print("listing_exp_len", listing_exp_len)
     print("total_exp_month", total_exp_month)
@@ -306,22 +323,6 @@ def experience_total_duration(experience, intersection_must_list):
                     print("Unexcepted error", e)
     print(experience_duration)
     return experience_duration
-
-
-def extract_text(resume_full_path, ext):
-    strt_time = datetime.datetime.now()
-    # INPUTS
-    # resume_full_path: full file path of CV
-    # ext: extension of CV file (e.g. .pdf)
-    if ext == '.pdf':
-        text_raw = extract_text_from_pdf(resume_full_path)
-    # elif ext == '.docx':
-    #     text_raw = extract_text_from_docx(resume_full_path)
-    else:
-        text_raw = extract_text_from_any(resume_full_path)
-    end_time = datetime.datetime.now() - strt_time
-    print("EXTR TXT",end_time)
-    return text_raw
 
 
 def extract_name():
@@ -377,7 +378,34 @@ def matcher(found_arr,dep):
             return s
     return None
 
+from concurrent.futures import ProcessPoolExecutor
+
+
+def extract_skills2(text_raw, noun_chunks, skills_file=None):
+    # A Draft for threads for EXT SKILLS
+    threads = []
+    #(len(noun_chunks))/2]
+    #with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
+    pool = ProcessPoolExecutor(2)
+
+    #arrays = [(text_raw[:int(len(text_raw) / 2)], noun_chunks[:int(len(noun_chunks) / 2)],None),
+              #(extract_skills2, text_raw[int(len(text_raw) / 2):],noun_chunks[int(len(noun_chunks) / 2):], None)]
+    #future = executor.submit(extract_skills2,text_raw, noun_chunks, None)
+    #future = executor.map(extract_skills2,arrays)
+    array1 = [text_raw[:int(len(text_raw) / 2)],noun_chunks[:int(len(noun_chunks) / 2)], None]
+    array2 = [text_raw[int(len(text_raw) / 2):],noun_chunks[int(len(noun_chunks) / 2):], None]
+    future = pool.submit(lambda d: extract_skills2(*d),array1)
+    future = pool.submit(lambda d: extract_skills2(*d), array1)
+    #future2 = executor.submit(extract_skills2, text_raw[int(len(text_raw) / 2):],
+                         #noun_chunks[int(len(noun_chunks) / 2):], None)
+    #     # t1.start()
+    # t2.start()
+    # print("T1",t1.join())
+
+    return future.result()
+    #return {**future.result(),**future2.result()}
 def extract_skills(text_raw, noun_chunks, skills_file=None):
+
     strt_time = datetime.datetime.now()
     # Inputs are:
     # text raw: full string version of CV file
@@ -390,7 +418,12 @@ def extract_skills(text_raw, noun_chunks, skills_file=None):
     :param noun_chunks: noun chunks extracted from nlp text
     :return: list of skills extracted
     '''
-    tokens = [token.text for token in text_raw if not token.is_stop]
+    #tokens = [token.text for token in text_raw if not token.is_stop]
+
+    if len(text_raw)>1:
+        tokens = text_raw.text.split()
+    else:
+        return {}
     if not skills_file:
         data = pd.read_csv(
             os.path.join(os.path.dirname(__file__), 'updated_u.csv')
@@ -1057,16 +1090,18 @@ def job_listing_years_ext(text_raw):
     print("JOB LISTING YEARS EXT",end_time)
     return exp
 
-# def refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min, score):
-#     print(experience_duration_totals_dict, listing_exp_len_min, score)
-#     for skill, duration in experience_duration_totals_dict.items():
-#         if abs(duration-listing_exp_len_min) < 13:
-#             if 0 < score < 40:
-#                 score = score + 12
-#             elif 40 < score < 60:
-#                 score = score + 10
-#             elif 60 < score < 80:
-#                 score = score + 5
-#             elif 80 < score < 90:
-#                 score = score + 3
-#     return score
+
+def refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min, score):
+    print(experience_duration_totals_dict, listing_exp_len_min, score)
+    for skill, duration in experience_duration_totals_dict.items():
+        if abs(duration-listing_exp_len_min) < 13:
+            if 0 < score < 40:
+                score = score + 12
+            elif 40 < score < 60:
+                score = score + 10
+            elif 60 < score < 80:
+                score = score + 5
+            elif 80 < score < 90:
+                score = score + 3
+    return score
+
