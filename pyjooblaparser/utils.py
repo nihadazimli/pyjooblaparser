@@ -742,7 +742,7 @@ def entity_grad_2(text):
     text = re.sub(":|,|\."," ",text)
     text = re.sub("\n"," ",text)
     text = re.sub("\t"," ",text)
-    text = re.sub("  "," ",text)
+    text = re.sub("\s+"," ",text)
     text2_U = text.split(" ")
     text2 = text.lower().split(" ")
 
@@ -753,29 +753,44 @@ def entity_grad_2(text):
     except:
         education = text2.index("college")
     experiences = re.findall(r'(?P<fmonth>\w+.\d\d\d\d)\s*(\D|to)\s*(?P<smonth>\w+.\d\d\d\d|present)', text, re.I)
+
+
+
     print(experiences)
     print("eEE",experiences)
 
 
     try:
+        if get_number_of_months_from_dates(experiences[0][0], experiences[0][2]) is not 0:
 
-        experience = t.index(experiences[0][0].split(" ")[0].lower())
+
+            experience = t.index(experiences[0][0].split(" ")[-1].lower())
+            print("ALAA",experience)
+        else:
+            experiences = experiences[1:]
+            experience = t.index(experiences[0][-1].split(" ")[-1].lower())
+            print("ALAA", experiences[0][-1].split(" ")[-1].lower())
+        print("NIHAD GOR",experiences)
     except IndexError:
-        experience = t.index(experiences[0].split(" ")[0].lower())
+        print("OHAA")
+        #experience = t.index(experiences[0].split(" ")[0].lower())
     if education > experience:
-        exp_end = education - 1
-        exp_end = education - 1
+        exp_end = len(t)-1
         edu_end = len(t)-1
     else:
         edu_end = experience - 1
         exp_end = len(t)-1
+    print(education,edu_end)
+    print(experience,exp_end)
     edu = text2_U[education-10:edu_end]
     edu = ' '.join(edu)
     edu = edu.split('\n')
     exp = text2_U[experience-15:exp_end]
     exp = ' '.join(exp)
     for i in experiences:
-        exp = re.sub(i[-1],str(i[-1]+" \n"), exp)
+        print("NONO",i)
+        s =' '.join(i)
+        exp = re.sub(s,str(s+" \n"), exp)
     exp = exp.split("\n")
     print("education",edu)
 
