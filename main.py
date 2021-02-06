@@ -201,7 +201,7 @@ def algorithm_result():
 
         listing_exp_len_min = int(listing_exp_len['min'])*12
 
-        bonus  = 0
+        bonus = 0
         if cv_data['top100'] is not None:
             bonus = bonus + 10
         dep_CV = cv_data['education']['DEP']
@@ -218,6 +218,7 @@ def algorithm_result():
                         dep2 = stemmer.stem(k)
                         if dep1 == dep2:
                             bonus =  bonus + 10
+                            break
                         print("DEPARTAMENTS", dep1, dep2)
             else:
                 for i in dep_listing:
@@ -320,6 +321,7 @@ def algorithm_result():
                                                                 #final_score_wout_weight)
         #final_score_modified = utils.refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min,
                                                           #  final_score_modified)
+        print("Bonus",bonus)
         final_score = str(final_score_modified)[:5]
         score_must = str((score_must / (len(listing_skills_must) * config.WEIGHT_MUST))*100)[:5]
         score_good = str((score_good / (len(listing_skills_good) * config.WEIGHT_GOOD))*100)[:5]
