@@ -3,12 +3,10 @@ from werkzeug.utils import secure_filename
 import os
 import config
 import xlsxwriter
-import csv
 from pyjooblaparser import ResumeParser
 from pyjooblaparser import ListingParser
 from nltk import SnowballStemmer
 from pyjooblaparser import utils
-
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = config.UPLOAD_FILES_DIR
@@ -119,14 +117,14 @@ def new_test_run():
 
             try:
                 intersection_list_must = list(set(skills_cv) & set(skills_listing_must.keys()))
-                score_must = len(intersection_list_must)*config.WEIGHT_MUST
+                score_must = len(intersection_list_must) * config.WEIGHT_MUST
                 score += score_must
             except:
                 intersection_list_must = {}
 
             try:
                 intersection_list_good = list(set(skills_cv) & set(skills_listing_good.keys()))
-                score_good = len(intersection_list_good)*config.WEIGHT_GOOD
+                score_good = len(intersection_list_good) * config.WEIGHT_GOOD
                 score += score_good
 
             except:
@@ -134,23 +132,22 @@ def new_test_run():
 
             try:
                 intersection_list_soft = list(set(skills_cv) & set(skills_listing_soft))
-                score_soft = len(intersection_list_soft)*config.WEIGHT_SOFT
+                score_soft = len(intersection_list_soft) * config.WEIGHT_SOFT
                 score += score_soft
             except:
                 intersection_list_soft = []
 
             total_score = len(skills_listing_must) * config.WEIGHT_MUST + len(
-                    skills_listing_good) * config.WEIGHT_GOOD + \
-                              len(skills_listing_soft) * config.WEIGHT_SOFT
+                skills_listing_good) * config.WEIGHT_GOOD + \
+                          len(skills_listing_soft) * config.WEIGHT_SOFT
 
             final_score = str(score / total_score * 100)[:5]
             full_cv_score_list.append(filename_cv + " is " + final_score)
 
         return render_template('new_test_run.html',
-                           final_score_list=full_cv_score_list)
+                               final_score_list=full_cv_score_list)
     elif request.method == 'GET':
         return "ASDASDASD"
-
 
 
 @app.route('/tryAlgo')
@@ -177,7 +174,6 @@ def algorithm_result():
         print(experience)
         education = cv_data['education']
 
-
         experience_list = []
         experience_skills_list_total = []
         for x, y in experience.items():
@@ -194,52 +190,65 @@ def algorithm_result():
 
         listing = ListingParser(config.UPLOAD_FILES_DIR + config.LISTING_SUBFOLDER + '/' + listing_name)
 
-        listing_data = listing.cluster_divider("./clusters/must_have.txt", "./clusters/good_to_have.txt", "./clusters/soft_skills.txt")
+        listing_data = listing.cluster_divider("./clusters/must_have.txt", "./clusters/good_to_have.txt",
+                                               "./clusters/soft_skills.txt")
         listing_d = listing.get_details()
         listing_exp_len = listing_d['years_of_exp']
 
         print("listing_exp_len", listing_exp_len)
 
-        listing_exp_len_min = int(listing_exp_len['min'])*12
+        total_exp_month = 0
+        for i in experience:
+            total_exp_month = total_exp_month + experience[i]['Month']
+
+        total_exp_year = total_exp_month / 12
+
+        if 0 <= total_exp_year <= 3:
+            candidate_level = 'junior'
+        elif 4 <= total_exp_year <= 9:
+            candidate_level = 'medior'
+        elif 9 <= total_exp_year <= 100:
+            candidate_level = 'senior'
+        else:
+            candidate_level = 'god'
 
         bonus = 0
+        bonus_university = 0
+        bonus_department = 0
+
         if cv_data['top100'] is not None:
-            bonus = bonus + 10
-        dep_CV = cv_data['education']['DEP']
+            bonus_university = 10
+        dep_cv = cv_data['education']['DEP']
         dep_listing = listing_d['education']
-        if len(dep_CV) > 0 and len(dep_listing)> 0:
+        if len(dep_cv) > 0 and len(dep_listing) > 0:
             stemmer = SnowballStemmer("english")
-            dep_CV_arr = dep_CV.split()
-            if len(dep_CV_arr) == 2:
-                for k in dep_CV_arr:
+            dep_cv_arr = dep_cv.split()
+            if len(dep_cv_arr) == 2:
+                for k in dep_cv_arr:
                     for i in dep_listing:
                         z = i.split()
                         z = z[0]
                         dep1 = stemmer.stem(z)
                         dep2 = stemmer.stem(k)
                         if dep1 == dep2:
-                            bonus =  bonus + 10
+                            if candidate_level == 'junior':
+                                bonus = bonus + 10
+                                bonus_department = 10
+                            elif candidate_level == 'medior':
+                                bonus = bonus + 5
+                                bonus_department = 5
+                            elif candidate_level == 'senior':
+                                bonus = bonus + 3
+                                bonus_department = 3
                             break
-                        print("DEPARTAMENTS", dep1, dep2)
+                        print("DEPARTMENTS", dep1, dep2)
             else:
                 for i in dep_listing:
                     dep1 = stemmer.stem(i)
-                    dep2 = stemmer.stem(dep_CV)
-                    print("DEPARTAMENTS",dep1,dep2)
-
+                    dep2 = stemmer.stem(dep_cv)
+                    print("DEPARTAMENTS", dep1, dep2)
 
         print("listing_exp_len", listing_exp_len)
-
-        listing_exp_len_min = int(listing_exp_len['min'])*12
-
-
-        total_exp_month = 0
-        for i in experience:
-            total_exp_month = total_exp_month + experience[i]['Month']
-
-        # MODERATING_VALUE = 1
-        # print(listing_exp_len)
-        # dynamic_weighting_denominator = abs(int(listing_exp_len['min']) * 12 - int(total_exp_month)) * MODERATING_VALUE
 
         score = 0
         score_must = 0
@@ -267,7 +276,7 @@ def algorithm_result():
         try:
             intersection_list_must = list(set(skills_cv) & set(skills_listing_must.keys()))
             intersection_list_total_len += len(intersection_list_must)
-            score_must = len(intersection_list_must)*(config.WEIGHT_MUST)#-dynamic_weighting_denominator)
+            score_must = len(intersection_list_must) * (config.WEIGHT_MUST)  # -dynamic_weighting_denominator)
             score += score_must
             score = score
         except:
@@ -276,7 +285,7 @@ def algorithm_result():
         try:
             intersection_list_good = list(set(skills_cv) & set(skills_listing_good.keys()))
             intersection_list_total_len += len(intersection_list_good)
-            score_good = len(intersection_list_good)*config.WEIGHT_GOOD
+            score_good = len(intersection_list_good) * config.WEIGHT_GOOD
             score += score_good
 
         except:
@@ -285,7 +294,7 @@ def algorithm_result():
         try:
             intersection_list_soft = list(set(skills_cv) & set(skills_listing_soft))
             intersection_list_total_len += len(intersection_list_soft)
-            score_soft = len(intersection_list_soft)*config.WEIGHT_SOFT
+            score_soft = len(intersection_list_soft) * config.WEIGHT_SOFT
             score += score_soft
         except:
             intersection_list_soft = []
@@ -317,23 +326,24 @@ def algorithm_result():
         cv_skills_result = ", ".join((k + ' : ' + str(v)) for k, v in skills_cv.items())
         cv_skills_result = cv_skills_result.split(',')
 
-        total_score = len(listing_skills_must)*config.WEIGHT_MUST  + len(listing_skills_good)*config.WEIGHT_GOOD + \
-                      len(listing_skills_soft)*config.WEIGHT_SOFT
+        total_score = len(listing_skills_must) * config.WEIGHT_MUST + len(listing_skills_good) * config.WEIGHT_GOOD + \
+                      len(listing_skills_soft) * config.WEIGHT_SOFT
 
-
-        #final_score = str((score / total_score * 100))[:5]
+        # final_score = str((score / total_score * 100))[:5]
 
         final_score_modified = score / total_score * 100
-        #final_score_modified = utils.refine_score_by_experience(listing_exp_len_min, total_exp_month,
-                                                                #final_score_wout_weight)
-        #final_score_modified = utils.refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min,
-                                                          #  final_score_modified)
-        print("Bonus",bonus)
-        final_score = str(final_score_modified)[:5]
+        # final_score_modified = utils.refine_score_by_experience(listing_exp_len_min, total_exp_month,
+        # final_score_wout_weight)
+        # final_score_modified = utils.refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min,
+        #  final_score_modified)
+        bonus = bonus_department + bonus_university
+        print("Bonus", bonus)
+        final_score = final_score_modified + bonus
+        final_score = str(final_score)[:5]
 
-        score_must = str((score_must / (len(listing_skills_must) * config.WEIGHT_MUST))*100)[:5]
-        score_good = str((score_good / (len(listing_skills_good) * config.WEIGHT_GOOD))*100)[:5]
-        score_soft = str((score_soft / (len(listing_skills_soft) * config.WEIGHT_SOFT))*100)[:5]
+        score_must = str((score_must / (len(listing_skills_must) * config.WEIGHT_MUST)) * 100)[:5]
+        score_good = str((score_good / (len(listing_skills_good) * config.WEIGHT_GOOD)) * 100)[:5]
+        score_soft = str((score_soft / (len(listing_skills_soft) * config.WEIGHT_SOFT)) * 100)[:5]
 
         workbook_filename = cv_name.split('.')[0] + '__' + listing_name.split('.')[0] + '.xlsx'
         workbook = xlsxwriter.Workbook(app.config['UPLOAD_FOLDER'] + '/' + workbook_filename)
@@ -377,7 +387,7 @@ def algorithm_result():
         count = 1
         for k, v in skills_cv.items():
             count += 1
-            worksheet.write('E'+str(count), k + ' : ' + str(v))
+            worksheet.write('E' + str(count), k + ' : ' + str(v))
 
         count = 1
         for k, v in matching_skills_must_dict.items():
@@ -399,7 +409,9 @@ def algorithm_result():
 
         workbook.close()
         return render_template('test.html',
-                               listing_month_of_exp=str(int(listing_exp_len['min'])*12),
+                               bonus_university=bonus_university,
+                               bonus_department=bonus_department,
+                               listing_month_of_exp=str(int(listing_exp_len['min']) * 12),
                                resume_month_of_exp=total_exp_month,
                                matching_skills_must=matching_skills_must,
                                matching_skills_good=matching_skills_good,
@@ -446,9 +458,9 @@ def download(filename):
         except Exception as error:
             app.logger.error("Error removing or closing downloaded file handle", error)
         return response
+
     return send_from_directory(directory=uploads, filename=filename)
 
 
 if __name__ == '__main__':
     app.run()
-
