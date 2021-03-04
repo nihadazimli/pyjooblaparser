@@ -1,6 +1,8 @@
 # Libraries to be used
 import docx2txt
 import textract
+from nltk import SnowballStemmer
+import xlsxwriter
 from textblob import TextBlob
 from pdfminer.converter import TextConverter
 from pdfminer.pdfinterp import PDFPageInterpreter
@@ -753,7 +755,7 @@ def extract_experience(experience_list):
                     except:
                         cons_uppper = cons_uppper
                     exp_name = " ".join(cons_uppper)
-            elif len(cons_uppper[0]) > 0:
+            elif len(cons_uppper) > 0 and len(cons_uppper[0]) > 0:
                 try:
                     cons_uppper = cons_uppper[0][:4]
                 except:
@@ -920,3 +922,111 @@ def refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min,
             elif 80 < score < 90:
                 score = score + 3
     return score
+
+
+def refine_score_by_education(cv_data, candidate_level, listing_d_education):
+
+    bonus = 0
+
+    if cv_data['top100'] is not None:
+        bonus_university = 10
+    dep_cv = cv_data['education']['DEP']
+    dep_listing = listing_d_education
+    if len(dep_cv) > 0 and len(dep_listing) > 0:
+        stemmer = SnowballStemmer("english")
+        dep_cv_arr = dep_cv.split()
+        if len(dep_cv_arr) == 2:
+            for k in dep_cv_arr:
+                for i in dep_listing:
+                    z = i.split()
+                    z = z[0]
+                    dep1 = stemmer.stem(z)
+                    dep2 = stemmer.stem(k)
+                    if dep1 == dep2:
+                        if candidate_level == 'junior':
+                            bonus = bonus + 10
+                            bonus_department = 10
+                        elif candidate_level == 'medior':
+                            bonus = bonus + 5
+                            bonus_department = 5
+                        elif candidate_level == 'senior':
+                            bonus = bonus + 3
+                            bonus_department = 3
+                        break
+                    print("DEPARTMENTS", dep1, dep2)
+        else:
+            for i in dep_listing:
+                dep1 = stemmer.stem(i)
+                dep2 = stemmer.stem(dep_cv)
+                print("DEPARTAMENTS", dep1, dep2)
+
+    return bonus
+
+
+def convert_to_excel(cv_name,listing_name, upload_folder, final_score, skills_cv,
+                     matching_skills_must_dict, matching_skills_good_dict, matching_skills_soft_dict,
+                     score_must, score_good, score_soft):
+    workbook_filename = cv_name.split('.')[0] + '__' + listing_name.split('.')[0] + '.xlsx'
+    workbook = xlsxwriter.Workbook(upload_folder + '/' + workbook_filename)
+    worksheet = workbook.add_worksheet()
+
+    # Widen the first column to make the text clearer.
+    worksheet.set_column('A:A', 20)
+    worksheet.set_column('B:B', 20)
+    worksheet.set_column('C:C', 20)
+    worksheet.set_column('D:D', 10)
+    worksheet.set_column('E:E', 20)
+    worksheet.set_column('F:F', 20)
+    worksheet.set_column('G:G', 10)
+    worksheet.set_column('H:H', 20)
+    worksheet.set_column('I:I', 10)
+    worksheet.set_column('J:J', 20)
+    worksheet.set_column('K:K', 10)
+
+    # Add a bold format to use to highlight cells.
+    bold = workbook.add_format({'bold': True})
+
+    # Write some simple text.
+    worksheet.write('A1', 'CV ID', bold)
+    worksheet.write('B1', 'JOB LISTING ID', bold)
+    worksheet.write('C1', 'EXPECTED SCORE', bold)
+    worksheet.write('D1', 'SCORE', bold)
+    worksheet.write('E1', 'CV KEYWORDS', bold)
+    worksheet.write('F1', 'CLUSTER MUST HAVE MATCH', bold)
+    worksheet.write('G1', 'CLUSTER MUST HAVE SCORE', bold)
+    worksheet.write('H1', 'CLUSTER GOOD TO HAVE MATCH', bold)
+    worksheet.write('I1', 'CLUSTER GOOD TO HAVE SCORE', bold)
+    worksheet.write('J1', 'CLUSTER SOFT MATCH', bold)
+    worksheet.write('K1', 'CLUSTER SOFT SCORE', bold)
+
+    # Text with formatting.
+    worksheet.write('A2', cv_name)
+    worksheet.write('B2', listing_name)
+    worksheet.write('C2', '')
+    worksheet.write('D2', final_score)
+
+    count = 1
+    for k, v in skills_cv.items():
+        count += 1
+        worksheet.write('E' + str(count), k + ' : ' + str(v))
+
+    count = 1
+    for k, v in matching_skills_must_dict.items():
+        count += 1
+        worksheet.write('F' + str(count), k + ' : ' + str(v))
+    worksheet.write('G2', score_must)
+
+    count = 1
+    for k, v in matching_skills_good_dict.items():
+        count += 1
+        worksheet.write('H' + str(count), k + ' : ' + str(v))
+    worksheet.write('I2', score_good)
+
+    count = 1
+    for k, v in matching_skills_soft_dict.items():
+        count += 1
+        worksheet.write('J' + str(count), k + ' : ' + str(v))
+    worksheet.write('K2', score_soft)
+
+    workbook.close()
+    return workbook_filename

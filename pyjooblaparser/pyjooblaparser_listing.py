@@ -78,7 +78,7 @@ class ListingParser(object):
     def __populate_details(self):
         self.__details['years_of_exp'] = utils.job_listing_years_ext(self.__text_raw)
         self.__details['education'] = utils.extract_department_listing(self.__text_raw)
-        print("EDUCATION",self.__details['education'] )
+        print("EDUCATION",self.__details['education'])
         return self
 
     def get_details(self):
