@@ -1,0 +1,36 @@
+TicketSwap is growing fast in new products, services and markets. We are looking for a Data Engineer/MLOps to be a driving force in the design and development of data solutions on our AWS hosted platform. Not only will you belong to a high performing team, you’ll also interact with and inform Ticketswap's internal stakeholders. Data Engineering is instrumental in abstracting, modularizing and formatting our infrastructure, allowing us to operationalise data science/analytics work across different countries and over 5 million users already.
+
+
+Are you ready to join the world’s favorite place for fans to buy and sell tickets? Continue reading below! 👇
+
+
+What you can expect from the work:
+
+You’ll be part of our data team, which also comprises of machine learning and BI teams, and you will work closely with our security, infrastructure & performance (SIP) team;
+You’ll support our Data team with designing, building and managing scalable data pipelines. You will also be responsible for the architecture facilitating our batch and realtime ML models;
+You’ll be the driving force in the design and development of data solutions on our AWS hosted platform;
+You design and manage a systematic way of working with data and make sure that the data is accessible and easily understandable by the end users. You are also willing to modernise data lake and make it near real time and ready for 5 years;
+You love to automate things and make things more efficient. Technologies we are using: Docker, Kubernetes, Helm, CircleCI, Prometheus, Terraform, Kafka, Kinesis, AWS, Redshift, Presto, Amazon SageMaker, ElasticSearch and many more 💪;
+Data Integration: Contribute to the design and implementation of scalable ETL and data processing systems to go into our big data ecosystem, including data collection from multiple sources, cleaning, processing, ETL and the creation of a common data lake.
+
+TicketSwap Perks & Benefits
+
+At TicketSwap we don't only care about a competitive salary. We want you to be happy and healthy and get the best result possible, every single day! That's why we're offering a range of perks and benefits that we hope will help you reach all your goals and ambitions in life.
+Remote friendly
+Macbook Pro and 27'' monitor
+24 paid vacation days a year
+Diverse team with 15+ nationalities
+Penion plan, fully paid by TicketSwap
+
+About you
+
+BS/MS/PhD in Computer Science or related quantitative fields;
+At least 3 years of experience in data engineering, ML Ops and AWS Cloud Architecture.
+2+ years of experience designing data lake and ETL architectures with big data technologies such as Spark, Presto, Kafka and/or HDFS;
+Extensive experience with Docker and Kubernetes;
+Familiar with building data architecture for scalable and real time recommendation engines;
+Experience with optimising the data infrastructure for batch machine learning and analytics;
+Experience with SQL/NoSQL systems such as MongoDB, Solr, Elasticsearch, Redshift, DynamoDB, S3, etc;
+Fluent in Python and/or Go;
+Highly organised, structured work approach and dependable;
+Deployment tools as Ansible, AWS CDK

@@ -77,78 +77,77 @@ def new_test():
 
 
 @app.route('/new_test_run', methods=['GET', 'POST'])
-def new_test_run():
-    if request.method == 'POST':
-
-        score = 0
-
-        files_cv = request.files.getlist('CV')
-
-        file_listing = request.files['LISTING']
-        filename_listing = secure_filename(file_listing.filename)
-        file_listing.save(os.path.join(app.config['UPLOAD_FOLDER'] + config.LISTING_SUBFOLDER, filename_listing))
-
-        listing_data = ListingParser(config.UPLOAD_FILES_DIR + config.LISTING_SUBFOLDER + '/' + filename_listing) \
-            .cluster_divider("./clusters/must_have.txt",
-                             "./clusters/good_to_have.txt",
-                             "./clusters/soft_skills.txt")
-
-        full_cv_score_list = []
-        for file_cv in files_cv:
-            score = 0
-            filename_cv = secure_filename(file_cv.filename)
-            file_cv.save(os.path.join(app.config['UPLOAD_FOLDER'] + config.CV_SUBFOLDER, filename_cv))
-
-            cv_data = ResumeParser(config.UPLOAD_FILES_DIR + config.CV_SUBFOLDER + '/' + filename_cv).get_details()
-            skills_cv = cv_data['skills']
-
-            if type(listing_data['Cluster 1']) is dict:
-                skills_listing_must = listing_data['Cluster 1']
-            else:
-                skills_listing_must = {}
-            if type(listing_data['Cluster 2']) is dict:
-                skills_listing_good = listing_data['Cluster 2']
-            else:
-                skills_listing_good = {}
-            if type(listing_data['Cluster 3']) is list:
-                skills_listing_soft = listing_data['Cluster 3']
-            else:
-                skills_listing_soft = []
-
-            try:
-                intersection_list_must = list(set(skills_cv) & set(skills_listing_must.keys()))
-                score_must = len(intersection_list_must) * config.WEIGHT_MUST
-                score += score_must
-            except:
-                intersection_list_must = {}
-
-            try:
-                intersection_list_good = list(set(skills_cv) & set(skills_listing_good.keys()))
-                score_good = len(intersection_list_good) * config.WEIGHT_GOOD
-                score += score_good
-
-            except:
-                intersection_list_good = {}
-
-            try:
-                intersection_list_soft = list(set(skills_cv) & set(skills_listing_soft))
-                score_soft = len(intersection_list_soft) * config.WEIGHT_SOFT
-                score += score_soft
-            except:
-                intersection_list_soft = []
-
-            total_score = len(skills_listing_must) * config.WEIGHT_MUST + len(
-                skills_listing_good) * config.WEIGHT_GOOD + \
-                          len(skills_listing_soft) * config.WEIGHT_SOFT
-
-            final_score = str(score / total_score * 100)[:5]
-            full_cv_score_list.append(filename_cv + " is " + final_score)
-
-        return render_template('new_test_run.html',
-                               final_score_list=full_cv_score_list)
-    elif request.method == 'GET':
-        return "ASDASDASD"
-
+# def new_test_run():
+#     if request.method == 'POST':
+#
+#         score = 0
+#
+#         files_cv = request.files.getlist('CV')
+#
+#         file_listing = request.files['LISTING']
+#         filename_listing = secure_filename(file_listing.filename)
+#         file_listing.save(os.path.join(app.config['UPLOAD_FOLDER'] + config.LISTING_SUBFOLDER, filename_listing))
+#
+#         listing_data = ListingParser(config.UPLOAD_FILES_DIR + config.LISTING_SUBFOLDER + '/' + filename_listing) \
+#             .cluster_divider("./clusters/must_have.txt",
+#                              "./clusters/good_to_have.txt",
+#                              "./clusters/soft_skills.txt")
+#
+#         full_cv_score_list = []
+#         for file_cv in files_cv:
+#             score = 0
+#             filename_cv = secure_filename(file_cv.filename)
+#             file_cv.save(os.path.join(app.config['UPLOAD_FOLDER'] + config.CV_SUBFOLDER, filename_cv))
+#
+#             cv_data = ResumeParser(config.UPLOAD_FILES_DIR + config.CV_SUBFOLDER + '/' + filename_cv).get_details()
+#             skills_cv = cv_data['skills']
+#
+#             if type(listing_data['Cluster 1']) is dict:
+#                 skills_listing_must = listing_data['Cluster 1']
+#             else:
+#                 skills_listing_must = {}
+#             if type(listing_data['Cluster 2']) is dict:
+#                 skills_listing_good = listing_data['Cluster 2']
+#             else:
+#                 skills_listing_good = {}
+#             if type(listing_data['Cluster 3']) is list:
+#                 skills_listing_soft = listing_data['Cluster 3']
+#             else:
+#                 skills_listing_soft = []
+#
+#             try:
+#                 intersection_list_must = list(set(skills_cv) & set(skills_listing_must.keys()))
+#                 score_must = len(intersection_list_must) * config.WEIGHT_MUST
+#                 score += score_must
+#             except:
+#                 intersection_list_must = {}
+#
+#             try:
+#                 intersection_list_good = list(set(skills_cv) & set(skills_listing_good.keys()))
+#                 score_good = len(intersection_list_good) * config.WEIGHT_GOOD
+#                 score += score_good
+#
+#             except:
+#                 intersection_list_good = {}
+#
+#             try:
+#                 intersection_list_soft = list(set(skills_cv) & set(skills_listing_soft))
+#                 score_soft = len(intersection_list_soft) * config.WEIGHT_SOFT
+#                 score += score_soft
+#             except:
+#                 intersection_list_soft = []
+#
+#             total_score = len(skills_listing_must) * config.WEIGHT_MUST + len(
+#                 skills_listing_good) * config.WEIGHT_GOOD + \
+#                           len(skills_listing_soft) * config.WEIGHT_SOFT
+#
+#             final_score = str(score / total_score * 100)[:5]
+#             full_cv_score_list.append(filename_cv + " is " + final_score)
+#
+#         return render_template('new_test_run.html',
+#                                final_score_list=full_cv_score_list)
+#     elif request.method == 'GET':
+#         return "ASDASDASD"
 
 @app.route('/tryAlgo')
 def try_algo():
@@ -171,7 +170,6 @@ def algorithm_result():
         cv_data = ResumeParser(config.UPLOAD_FILES_DIR + config.CV_SUBFOLDER + '/' + cv_name).get_details()
         skills_cv = cv_data['skills']
         experience = cv_data['experience']
-        print(experience)
         education = cv_data['education']
 
         experience_list = []
@@ -185,7 +183,6 @@ def algorithm_result():
                 experience_list.append("Name cannot be parsed " + " - " + str(y['Month']) + " month")
                 experience_skills_str = ", ".join((k + ' : ' + str(v)) for k, v in y['Skills'].items())
                 experience_skills_list_total.append(experience_skills_str.split(','))
-
         skills_cv_list = skills_cv.keys()
 
         listing = ListingParser(config.UPLOAD_FILES_DIR + config.LISTING_SUBFOLDER + '/' + listing_name)
@@ -212,41 +209,11 @@ def algorithm_result():
         else:
             candidate_level = 'god'
 
-        bonus = 0
         bonus_university = 0
         bonus_department = 0
+        bonus_experience = 0
 
-        if cv_data['top100'] is not None:
-            bonus_university = 10
-        dep_cv = cv_data['education']['DEP']
-        dep_listing = listing_d['education']
-        if len(dep_cv) > 0 and len(dep_listing) > 0:
-            stemmer = SnowballStemmer("english")
-            dep_cv_arr = dep_cv.split()
-            if len(dep_cv_arr) == 2:
-                for k in dep_cv_arr:
-                    for i in dep_listing:
-                        z = i.split()
-                        z = z[0]
-                        dep1 = stemmer.stem(z)
-                        dep2 = stemmer.stem(k)
-                        if dep1 == dep2:
-                            if candidate_level == 'junior':
-                                bonus = bonus + 10
-                                bonus_department = 10
-                            elif candidate_level == 'medior':
-                                bonus = bonus + 5
-                                bonus_department = 5
-                            elif candidate_level == 'senior':
-                                bonus = bonus + 3
-                                bonus_department = 3
-                            break
-                        print("DEPARTMENTS", dep1, dep2)
-            else:
-                for i in dep_listing:
-                    dep1 = stemmer.stem(i)
-                    dep2 = stemmer.stem(dep_cv)
-                    print("DEPARTAMENTS", dep1, dep2)
+        bonus_university += utils.refine_score_by_education(cv_data, candidate_level, listing_d['education'])
 
         print("listing_exp_len", listing_exp_len)
 
@@ -272,13 +239,38 @@ def algorithm_result():
         else:
             skills_listing_soft = []
 
+        # skills_listing_must, skills_listing_good = utils.modify_cluster(skills_listing_must, skills_listing_good)
         intersection_list_total_len = 0
+        experience_duration_totals_dict = {}
+        skill_experience = 0.0
+        listing_exp_month = int(listing_exp_len['min']) * 12
         try:
             intersection_list_must = list(set(skills_cv) & set(skills_listing_must.keys()))
+            skills_listing_must, skills_listing_good, intersection_list_must = \
+                utils.modify_cluster_favor(skills_listing_must, skills_listing_good,intersection_list_must)
+            print("skills_listing_must", skills_listing_must)
+            print("skills_listing_good", skills_listing_good)
+            print("intersection_list_must", intersection_list_must)
+
             intersection_list_total_len += len(intersection_list_must)
-            score_must = len(intersection_list_must) * (config.WEIGHT_MUST)  # -dynamic_weighting_denominator)
+
+            experience_duration_totals_dict = utils.experience_total_duration(experience, intersection_list_must)
+
+            if total_exp_month - listing_exp_month > 0:
+                for key, value in experience_duration_totals_dict.items():
+                    if value - listing_exp_month > 0:
+                        experience_value = float(value - listing_exp_month) / float(listing_exp_month)
+                        if experience_value > 0.5:
+                            skill_experience += 0.5
+                        else:
+                            skill_experience += experience_value
+                print("skill_experience", skill_experience)
+
+            if len(skills_listing_must.keys()) > len(intersection_list_must) + skill_experience:
+                score_must = (len(intersection_list_must) + skill_experience) * config.WEIGHT_MUST
+            else:
+                score_must = len(skills_listing_must.keys()) * config.WEIGHT_MUST
             score += score_must
-            score = score
         except:
             intersection_list_must = {}
 
@@ -299,8 +291,7 @@ def algorithm_result():
         except:
             intersection_list_soft = []
 
-        experience_duration_totals_dict = utils.experience_total_duration(experience, intersection_list_must)
-
+        print("experience_duration_totals_dict", experience_duration_totals_dict)
         matching_skills_must = intersection_list_must
         matching_skills_good = intersection_list_good
         matching_skills_soft = intersection_list_soft
@@ -329,13 +320,8 @@ def algorithm_result():
         total_score = len(listing_skills_must) * config.WEIGHT_MUST + len(listing_skills_good) * config.WEIGHT_GOOD + \
                       len(listing_skills_soft) * config.WEIGHT_SOFT
 
-        # final_score = str((score / total_score * 100))[:5]
-
         final_score_modified = score / total_score * 100
-        # final_score_modified = utils.refine_score_by_experience(listing_exp_len_min, total_exp_month,
-        # final_score_wout_weight)
-        # final_score_modified = utils.refine_score_by_skills(experience_duration_totals_dict, listing_exp_len_min,
-        #  final_score_modified)
+
         bonus = bonus_department + bonus_university
         print("Bonus", bonus)
         final_score = final_score_modified + bonus
@@ -345,69 +331,12 @@ def algorithm_result():
         score_good = str((score_good / (len(listing_skills_good) * config.WEIGHT_GOOD)) * 100)[:5]
         score_soft = str((score_soft / (len(listing_skills_soft) * config.WEIGHT_SOFT)) * 100)[:5]
 
-        workbook_filename = cv_name.split('.')[0] + '__' + listing_name.split('.')[0] + '.xlsx'
-        workbook = xlsxwriter.Workbook(app.config['UPLOAD_FOLDER'] + '/' + workbook_filename)
-        worksheet = workbook.add_worksheet()
+        upload_folder_excel = app.config['UPLOAD_FOLDER']
 
-        # Widen the first column to make the text clearer.
-        worksheet.set_column('A:A', 20)
-        worksheet.set_column('B:B', 20)
-        worksheet.set_column('C:C', 20)
-        worksheet.set_column('D:D', 10)
-        worksheet.set_column('E:E', 20)
-        worksheet.set_column('F:F', 20)
-        worksheet.set_column('G:G', 10)
-        worksheet.set_column('H:H', 20)
-        worksheet.set_column('I:I', 10)
-        worksheet.set_column('J:J', 20)
-        worksheet.set_column('K:K', 10)
+        workbook_filename = utils.convert_to_excel(cv_name, listing_name, upload_folder_excel, final_score, skills_cv,
+                                                   matching_skills_must_dict, matching_skills_good_dict,
+                                                   matching_skills_soft_dict, score_must, score_good, score_soft)
 
-        # Add a bold format to use to highlight cells.
-        bold = workbook.add_format({'bold': True})
-
-        # Write some simple text.
-        worksheet.write('A1', 'CV ID', bold)
-        worksheet.write('B1', 'JOB LISTING ID', bold)
-        worksheet.write('C1', 'EXPECTED SCORE', bold)
-        worksheet.write('D1', 'SCORE', bold)
-        worksheet.write('E1', 'CV KEYWORDS', bold)
-        worksheet.write('F1', 'CLUSTER MUST HAVE MATCH', bold)
-        worksheet.write('G1', 'CLUSTER MUST HAVE SCORE', bold)
-        worksheet.write('H1', 'CLUSTER GOOD TO HAVE MATCH', bold)
-        worksheet.write('I1', 'CLUSTER GOOD TO HAVE SCORE', bold)
-        worksheet.write('J1', 'CLUSTER SOFT MATCH', bold)
-        worksheet.write('K1', 'CLUSTER SOFT SCORE', bold)
-
-        # Text with formatting.
-        worksheet.write('A2', cv_name)
-        worksheet.write('B2', listing_name)
-        worksheet.write('C2', '')
-        worksheet.write('D2', final_score)
-
-        count = 1
-        for k, v in skills_cv.items():
-            count += 1
-            worksheet.write('E' + str(count), k + ' : ' + str(v))
-
-        count = 1
-        for k, v in matching_skills_must_dict.items():
-            count += 1
-            worksheet.write('F' + str(count), k + ' : ' + str(v))
-        worksheet.write('G2', score_must)
-
-        count = 1
-        for k, v in matching_skills_good_dict.items():
-            count += 1
-            worksheet.write('H' + str(count), k + ' : ' + str(v))
-        worksheet.write('I2', score_good)
-
-        count = 1
-        for k, v in matching_skills_soft_dict.items():
-            count += 1
-            worksheet.write('J' + str(count), k + ' : ' + str(v))
-        worksheet.write('K2', score_soft)
-
-        workbook.close()
         return render_template('test.html',
                                bonus_university=bonus_university,
                                bonus_department=bonus_department,
