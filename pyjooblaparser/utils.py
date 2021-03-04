@@ -16,6 +16,7 @@ import pandas as pd
 import datetime
 from dateutil import relativedelta
 from nltk.corpus import stopwords
+from collections import OrderedDict
 
 
 ##CONSTANTS###
@@ -1030,3 +1031,74 @@ def convert_to_excel(cv_name,listing_name, upload_folder, final_score, skills_cv
 
     workbook.close()
     return workbook_filename
+
+
+def modify_cluster(skills_listing_must, skills_listing_good):
+    modified_skills_listing_good = skills_listing_good
+    modified_skills_listing_must = skills_listing_must
+    if len(skills_listing_must) > 10:
+        ordered_dict = OrderedDict(sorted(skills_listing_must.items(), key=lambda item: item[1],reverse=True))
+        top_dict = dict(ordered_dict.items())
+        while len(top_dict) > 10:
+            item_tuple = top_dict.popitem()
+            try:
+                modified_skills_listing_good[item_tuple[0]] = item_tuple[1]
+            except:
+                modified_skills_listing_good[item_tuple[0]] += item_tuple[1]
+
+        modified_skills_listing_must = dict(top_dict)
+    if len(skills_listing_must) < 2:
+        if len(skills_listing_good) > 1:
+            count = 0
+            for item in skills_listing_good:
+                count += 1
+                try:
+                    modified_skills_listing_must[item] = skills_listing_good[item]
+                    modified_skills_listing_good[item] = None
+                except:
+                    modified_skills_listing_must[item] += skills_listing_good[item]
+                    modified_skills_listing_good[item] = None
+                if count == 10:
+                    break
+    return modified_skills_listing_must, modified_skills_listing_good
+
+
+def modify_cluster_favor(skills_listing_must, skills_listing_good, intersection_list_must):
+    modified_skills_listing_good = {}
+    modified_skills_listing_must = {}
+    match_skill_counter = 0
+    modified_intersection_list_must = []
+    if len(skills_listing_must) > 10:
+        ordered_dict = OrderedDict(sorted(skills_listing_must.items(), key=lambda item: item[1],reverse=True))
+        top_dict = dict(ordered_dict.items())
+        for match_skill in intersection_list_must:
+            if match_skill_counter < 10:
+                try:
+                    top_dict.pop(match_skill)
+                    modified_intersection_list_must.append(match_skill)
+                    modified_skills_listing_must[match_skill] = skills_listing_must[match_skill]
+                    match_skill_counter += 1
+                except:
+                    pass
+        while len(top_dict) > 10:
+            item_tuple = top_dict.popitem()
+            try:
+                modified_skills_listing_good[item_tuple[0]] = item_tuple[1]
+            except:
+                modified_skills_listing_good[item_tuple[0]] += item_tuple[1]
+
+    if len(skills_listing_must) < 2:
+        if len(skills_listing_good) > 1:
+            count = 0
+            for item in skills_listing_good:
+                count += 1
+                try:
+                    modified_skills_listing_must[item] = skills_listing_good[item]
+                    modified_skills_listing_good[item] = None
+                except:
+                    modified_skills_listing_must[item] += skills_listing_good[item]
+                    modified_skills_listing_good[item] = None
+                if count == 10:
+                    break
+
+    return modified_skills_listing_must, modified_skills_listing_good, modified_intersection_list_must

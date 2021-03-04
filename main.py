@@ -239,20 +239,25 @@ def algorithm_result():
         else:
             skills_listing_soft = []
 
+        # skills_listing_must, skills_listing_good = utils.modify_cluster(skills_listing_must, skills_listing_good)
         intersection_list_total_len = 0
         experience_duration_totals_dict = {}
         skill_experience = 0.0
         listing_exp_month = int(listing_exp_len['min']) * 12
         try:
             intersection_list_must = list(set(skills_cv) & set(skills_listing_must.keys()))
+            skills_listing_must, skills_listing_good, intersection_list_must = \
+                utils.modify_cluster_favor(skills_listing_must, skills_listing_good,intersection_list_must)
+            print("skills_listing_must", skills_listing_must)
+            print("skills_listing_good", skills_listing_good)
+            print("intersection_list_must", intersection_list_must)
+
             intersection_list_total_len += len(intersection_list_must)
 
             experience_duration_totals_dict = utils.experience_total_duration(experience, intersection_list_must)
 
             if total_exp_month - listing_exp_month > 0:
                 for key, value in experience_duration_totals_dict.items():
-                    print("value", value)
-                    print("listing_exp_month", listing_exp_month)
                     if value - listing_exp_month > 0:
                         experience_value = float(value - listing_exp_month) / float(listing_exp_month)
                         if experience_value > 0.5:
